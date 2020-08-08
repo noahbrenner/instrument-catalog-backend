@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "build": "node build.js",
-    "lint": "tsc --noEmit",
+    "lint": "tsc --noEmit && prettier --check --ignore-path .gitignore .",
+    "lint:fix": "prettier --write --ignore-path .gitignore .",
     "start": "node -r module-alias/register ./dist --env=production",
     "start:dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json"
