@@ -2,12 +2,12 @@
   "name": "instrument-catalog-backend",
   "version": "0.0.0",
   "scripts": {
-    "build": "node build.js",
     "lint": "tsc --noEmit && prettier --check --ignore-path .gitignore .",
     "lint:fix": "prettier --write --ignore-path .gitignore .",
-    "start": "node -r module-alias/register ./dist --env=production",
-    "start:dev": "nodemon",
-    "test": "nodemon --config ./spec/nodemon.json"
+    "test": "nodemon --config ./spec/nodemon.json",
+    "start": "nodemon",
+    "build": "node build.js",
+    "serve": "node -r module-alias/register ./dist --env=production"
   },
   "husky": {
     "hooks": {
