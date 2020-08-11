@@ -24,8 +24,30 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Security
-if (process.env.NODE_ENV === "production") {
-  app.use(helmet());
+app.use(
+  // As a REST API, we serve only JSON -- Thus, no content should (or even can)
+  // be loaded from documents served from our origin
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],
+      },
+    },
+    frameguard: {
+      action: "deny",
+    },
+  })
+);
+
+// Allow API calls from other origins
+if (process.env.NODE_ENV === "development") {
+  app.use((_req, res, next) => {
+    // TODO Set a specific origin
+    //  - Based on an environment variable
+    //  - In both development and production
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+  });
 }
 
 // Add APIs
