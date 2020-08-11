@@ -3,7 +3,7 @@ import morgan from "morgan";
 import path from "path";
 import helmet from "helmet";
 
-import express, { Request, Response, NextFunction } from "express";
+import express, { ErrorRequestHandler } from "express";
 import { BAD_REQUEST } from "http-status-codes";
 import "express-async-errors";
 
@@ -54,12 +54,12 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api", BaseRouter);
 
 // Print API errors
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use(((err: Error, req, res, next) => {
   logger.error(err.message, err);
   return res.status(BAD_REQUEST).json({
     error: err.message,
   });
-});
+}) as ErrorRequestHandler);
 
 // Export express instance
 export default app;
