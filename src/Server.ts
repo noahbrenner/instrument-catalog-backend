@@ -39,13 +39,11 @@ app.use(
   })
 );
 
-// Allow API calls from other origins
-if (process.env.NODE_ENV === "development") {
+// Allow API calls from the frontend, which is hosted separately
+const allowedOrigin = process.env.ACCESS_CONTROL_ALLOW_ORIGIN;
+if (allowedOrigin) {
   app.use((_req, res, next) => {
-    // TODO Set a specific origin
-    //  - Based on an environment variable
-    //  - In both development and production
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", allowedOrigin);
     next();
   });
 }
