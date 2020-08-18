@@ -9,4 +9,4 @@ services:
       - .:/app
     ports:
       - "${PORT}:${PORT}"
-    command: npm start:dev
+    command: npm run start:dev
