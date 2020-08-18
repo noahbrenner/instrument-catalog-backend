@@ -5,9 +5,9 @@
     "lint": "tsc --noEmit && prettier --check --ignore-path .gitignore .",
     "lint:fix": "prettier --write --ignore-path .gitignore .",
     "test": "nodemon --config ./spec/nodemon.json",
-    "start": "nodemon",
     "build": "node build.js",
-    "serve": "node -r module-alias/register ./dist --env=production"
+    "start": "node -r module-alias/register ./dist --env=production",
+    "start:dev": "nodemon"
   },
   "husky": {
     "hooks": {
