@@ -4,9 +4,20 @@ services:
     image: node:14.7.0-alpine
     env_file: ./.env
     user: ${UID:-1000}:${GID:-1000}
-    working_dir: /app
+    working_dir: /app-backend
     volumes:
-      - .:/app
+      - .:/app-backend
     ports:
       - "${PORT}:${PORT}"
     command: npm run start:dev
+
+  frontend:
+    image: node:14.7.0-alpine
+    env_file: ./.env
+    user: ${UID:-1000}:${GID:-1000}
+    working_dir: /app-frontend
+    volumes:
+      - ../instrument-catalog-frontend:/app-frontend
+    ports:
+      - "${FRONTEND_DEVSERVER_PORT}:${FRONTEND_DEVSERVER_PORT}"
+    command: npm run start
