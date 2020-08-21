@@ -57,12 +57,17 @@
 
 ### `npm` scripts
 
-- **`$ npm run lint`** - Report linting issues.
-- **`$ npm run lint:fix`** - Automatically fix some linting issue. Right now, this is just running [prettier](https://prettier.io/). Prettier is also run via a git hook when committing changes.
-- **`$ npm run test`** - Run the test suite.
-- **`$ npm run build`** - Transpile the server code from TypeScript into JavaScript.
-- **`$ npm start`** - Run the transpiled server in production mode.
-  - The server must be built first, so run `$ npm run build` before this.
-  - The `.env` file is _not_ read, so environment variables must be set manually in the production environment. See `template.env` for what values need to be defined. To test locally, you can set variables manually, for example (POSIX): `$ PORT=3000 npm start`
-- **`$ npm run start:dev`** - Start the dev server.
-  - **You generally shouldn't run this directly.** It's run inside a Docker container when you run `$ docker-compose up`.
+- Linting/Formatting
+  - **`$ npm run lint:types`** - Run static type checking for [TypeScript](https://www.typescriptlang.org/) files.
+  - **`$ npm run lint:format`** - Verify that formatting is consistent using [Prettier](https://prettier.io/).
+  - **`$ npm run lint`** - Run all of the above linters.
+  - **`$ npm run format`** - Reformat code using Prettier.
+    - _Prettier is also run (via a git hook) whenever you make a commit._
+  - **`$ npm run test`** - Run the test suite.
+- Building/Running
+  - **`$ npm run build`** - Transpile the server code from TypeScript into JavaScript.
+  - **`$ npm start`** - Run the transpiled server in production mode.
+    - The server must be built first, so run **`$ npm run build`** before this.
+    - The `.env` file is _not_ read, so environment variables must be set manually in the production environment. See `template.env` for what values need to be defined. To test locally, you can set variables manually, for example (POSIX): **`$ PORT=3000 npm start`**
+  - **`$ npm run start:dev`** - Start the dev server.
+    - **You generally shouldn't run this directly.** Instead, it's run inside a Docker container when you run **`$ docker-compose up`**.

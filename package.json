@@ -1,9 +1,12 @@
 {
   "name": "instrument-catalog-backend",
+  "private": true,
   "version": "0.0.0",
   "scripts": {
-    "lint": "tsc --noEmit && prettier --check --ignore-path .gitignore .",
-    "lint:fix": "prettier --write --ignore-path .gitignore .",
+    "lint:types": "tsc --noEmit",
+    "lint:format": "prettier --check --ignore-path .gitignore .",
+    "lint": "npm run lint:types && npm run lint:format",
+    "format": "prettier --write --ignore-path .gitignore .",
     "test": "nodemon --config ./spec/nodemon.json",
     "build": "node build.js",
     "start": "node -r module-alias/register ./dist --env=production",
