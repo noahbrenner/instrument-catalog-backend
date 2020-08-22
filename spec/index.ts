@@ -1,7 +1,7 @@
 import find from "find";
 import Jasmine from "jasmine";
 import commandLineArgs from "command-line-args";
-import logger from "@shared/Logger";
+import { logger } from "@shared/Logger";
 
 // Setup command line options
 const options = commandLineArgs([
@@ -34,7 +34,7 @@ jasmine.onComplete((passed: boolean) => {
 
 // Run all or a single unit-test
 if (options.testFile) {
-  const testFile = options.testFile;
+  const { testFile } = options;
   find.file(`${testFile}.spec.ts`, "./spec", (files) => {
     if (files.length === 1) {
       jasmine.specFiles = [files[0]];

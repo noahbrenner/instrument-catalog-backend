@@ -1,11 +1,9 @@
-import logger from "./Logger";
+import { logger } from "./Logger";
 
-export const pErr = (err: Error) => {
-  if (err) {
-    logger.error(err);
-  }
-};
+export function pErr(err: Error): void {
+  logger.error(err);
+}
 
-export const getRandomInt = () => {
+export function getRandomInt(): number {
   return Math.floor(Math.random() * 1_000_000_000_000);
-};
+}

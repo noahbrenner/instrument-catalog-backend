@@ -50,4 +50,4 @@ if (process.env.NODE_ENV === "production") {
   logger.add(consoleTransport);
 }
 
-export default logger;
+export { logger };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import UserRouter from "./Users";
+import { UserRouter } from "./Users";
 
 // Init router and path
 const router = Router();
@@ -8,4 +8,4 @@ const router = Router();
 router.use("/users", UserRouter);
 
 // Export the base-router
-export default router;
+export { router as BaseRouter };

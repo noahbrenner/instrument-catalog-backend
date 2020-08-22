@@ -3,7 +3,7 @@ import { getRandomInt } from "@shared/functions";
 import { MockDaoMock } from "../MockDb/MockDao.mock";
 import { IUserDao } from "./UserDao";
 
-class UserDao extends MockDaoMock implements IUserDao {
+export class UserDao extends MockDaoMock implements IUserDao {
   public async getOne(email: string): Promise<IUser | null> {
     try {
       const db = await super.openDb();
@@ -14,6 +14,7 @@ class UserDao extends MockDaoMock implements IUserDao {
       }
       return null;
     } catch (err) {
+      console.log(err);
       throw err;
     }
   }
@@ -23,6 +24,7 @@ class UserDao extends MockDaoMock implements IUserDao {
       const db = await super.openDb();
       return db.users;
     } catch (err) {
+      console.log(err);
       throw err;
     }
   }
@@ -30,10 +32,11 @@ class UserDao extends MockDaoMock implements IUserDao {
   public async add(user: IUser): Promise<void> {
     try {
       const db = await super.openDb();
-      user.id = getRandomInt();
-      db.users.push(user);
+      const newUser = { ...user, id: getRandomInt() };
+      db.users.push(newUser);
       await super.saveDb(db);
     } catch (err) {
+      console.log(err);
       throw err;
     }
   }
@@ -41,34 +44,29 @@ class UserDao extends MockDaoMock implements IUserDao {
   public async update(user: IUser): Promise<void> {
     try {
       const db = await super.openDb();
-      for (let i = 0; i < db.users.length; i++) {
-        if (db.users[i].id === user.id) {
-          db.users[i] = user;
-          await super.saveDb(db);
-          return;
-        }
+      const userIndex = db.users.findIndex(({ id }) => id === user.id);
+      if (userIndex === -1) {
+        throw new Error("User not found");
       }
-      throw new Error("User not found");
+      db.users[userIndex] = user;
+      await super.saveDb(db);
     } catch (err) {
+      console.log(err);
       throw err;
     }
   }
 
-  public async delete(id: number): Promise<void> {
+  public async delete(userId: number): Promise<void> {
     try {
       const db = await super.openDb();
-      for (let i = 0; i < db.users.length; i++) {
-        if (db.users[i].id === id) {
-          db.users.splice(i, 1);
-          await super.saveDb(db);
-          return;
-        }
+      const userIndex = db.users.findIndex(({ id }) => id === userId);
+      if (userIndex >= 0) {
+        await super.saveDb(db);
       }
-      throw new Error("User not found");
+      // Idempotent: No error if not found
     } catch (err) {
+      console.log(err);
       throw err;
     }
   }
 }
-
-export default UserDao;

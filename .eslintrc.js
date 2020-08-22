@@ -58,7 +58,15 @@ module.exports = {
     // Allow importing devDependencies in buid and test files
     "import/no-extraneous-dependencies": [
       "error",
-      { devDependencies: ["*.js", "*.mock.ts", "./spec/**"] },
+      { devDependencies: ["*.js", "**/*.mock.ts", "./spec/**"] },
     ],
   },
+
+  overrides: [
+    {
+      // We need to use require() in plain JS files
+      files: ["**/*.js"],
+      rules: { "@typescript-eslint/no-var-requires": "off" },
+    },
+  ],
 };

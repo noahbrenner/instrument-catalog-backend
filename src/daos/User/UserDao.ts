@@ -1,3 +1,4 @@
+/* eslint-disable -- We'll be replacing this functionality */
 import { IUser } from "@entities/User";
 
 export interface IUserDao {
@@ -8,49 +9,27 @@ export interface IUserDao {
   delete: (id: number) => Promise<void>;
 }
 
-class UserDao implements IUserDao {
-  /**
-   * @param email
-   */
+export class UserDao implements IUserDao {
   public async getOne(email: string): Promise<IUser | null> {
     // TODO
-    return [] as any;
+    // @ts-expect-error
+    return [];
   }
 
-  /**
-   *
-   */
   public async getAll(): Promise<IUser[]> {
     // TODO
-    return [] as any;
+    return [];
   }
 
-  /**
-   *
-   * @param user
-   */
   public async add(user: IUser): Promise<void> {
     // TODO
-    return {} as any;
   }
 
-  /**
-   *
-   * @param user
-   */
   public async update(user: IUser): Promise<void> {
     // TODO
-    return {} as any;
   }
 
-  /**
-   *
-   * @param id
-   */
   public async delete(id: number): Promise<void> {
     // TODO
-    return {} as any;
   }
 }
-
-export default UserDao;
