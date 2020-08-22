@@ -58,6 +58,8 @@
 ### `npm` scripts
 
 - Linting/Formatting
+  - **`$ npm run lint:lint`** - Lint codebase using [ESlint](https://eslint.org/).
+    - Some linting issues can be fixed automatically with: **`$ npm run lint:lint -- --fix`**
   - **`$ npm run lint:types`** - Run static type checking for [TypeScript](https://www.typescriptlang.org/) files.
   - **`$ npm run lint:format`** - Verify that formatting is consistent using [Prettier](https://prettier.io/).
   - **`$ npm run lint`** - Run all of the above linters.
