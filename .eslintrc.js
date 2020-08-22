@@ -1,4 +1,4 @@
-// Some insipration from:
+// Some inspiration from:
 // https://github.com/iamturns/create-exposed-app/blob/master/.eslintrc.js
 module.exports = {
   parser: "@typescript-eslint/parser",
