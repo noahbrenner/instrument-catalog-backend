@@ -3,5 +3,5 @@
   "compilerOptions": {
     "sourceMap": false
   },
-  "exclude": ["spec", "src/**/*.mock.ts"]
+  "exclude": ["tests", "src/**/*.test.ts", "src/**/*.mock.ts"]
 }

@@ -57,7 +57,9 @@
 
 ### `npm` scripts
 
-- Linting/Formatting
+- Testing/Linting/Formatting
+  - **`$ npm test`** - Run all tests using [Jest](https://jestjs.io/).
+    - Run tests in watch mode with: **`$ npm test -- --watch`**
   - **`$ npm run lint:lint`** - Lint codebase using [ESlint](https://eslint.org/).
     - Some linting issues can be fixed automatically with: **`$ npm run lint:lint -- --fix`**
   - **`$ npm run lint:types`** - Run static type checking for [TypeScript](https://www.typescriptlang.org/) files.
@@ -65,7 +67,6 @@
   - **`$ npm run lint`** - Run all of the above linters.
   - **`$ npm run format`** - Reformat code using Prettier.
     - _Prettier is also run (via a git hook) whenever you make a commit._
-  - **`$ npm run test`** - Run the test suite.
 - Building/Running
   - **`$ npm run build`** - Transpile the server code from TypeScript into JavaScript.
   - **`$ npm start`** - Run the transpiled server in production mode.

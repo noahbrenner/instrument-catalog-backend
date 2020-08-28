@@ -58,7 +58,7 @@ module.exports = {
     // Allow importing devDependencies in buid and test files
     "import/no-extraneous-dependencies": [
       "error",
-      { devDependencies: ["*.js", "**/*.mock.ts", "./spec/**"] },
+      { devDependencies: ["*.js", "src/**/*.test.ts", "tests/**/*.ts"] },
     ],
   },
 

@@ -1,3 +1,5 @@
+// Temporary: We'll be replacing this file with a real database
+// eslint-disable-next-line import/no-extraneous-dependencies
 import jsonfile from "jsonfile";
 
 import { IUser } from "../../entities/User";
