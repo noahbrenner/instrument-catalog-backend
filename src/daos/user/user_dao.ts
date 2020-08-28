@@ -1,5 +1,5 @@
 /* eslint-disable -- We'll be replacing this functionality */
-import { IUser } from "@entities/User";
+import { IUser } from "@entities/user";
 
 export interface IUserDao {
   getOne: (email: string) => Promise<IUser | null>;

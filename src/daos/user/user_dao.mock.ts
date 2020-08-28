@@ -1,7 +1,7 @@
-import { IUser } from "@entities/User";
+import { IUser } from "@entities/user";
 import { getRandomInt } from "@shared/functions";
-import { MockDaoMock } from "../MockDb/MockDao.mock";
-import { IUserDao } from "./UserDao";
+import { MockDaoMock } from "../mock_db/mock_dao.mock";
+import { IUserDao } from "./user_dao";
 
 export class UserDao extends MockDaoMock implements IUserDao {
   public async getOne(email: string): Promise<IUser | null> {

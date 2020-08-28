@@ -2,14 +2,14 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import jsonfile from "jsonfile";
 
-import { IUser } from "../../entities/User";
+import { IUser } from "../../entities/user";
 
 interface IDatabase {
   users: IUser[];
 }
 
 export class MockDaoMock {
-  private readonly dbFilePath = "src/daos/MockDb/MockDb.json";
+  private readonly dbFilePath = "src/daos/mock_db/mock_db.json";
 
   protected openDb(): Promise<IDatabase> {
     return jsonfile.readFile(this.dbFilePath);

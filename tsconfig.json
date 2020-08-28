@@ -17,7 +17,7 @@
       "@daos/*": ["src/daos/*"],
       "@entities/*": ["src/entities/*"],
       "@shared/*": ["src/shared/*"],
-      "@server": ["src/Server"]
+      "@server": ["src/server"]
     },
     "types": ["node", "jest"]
   },
