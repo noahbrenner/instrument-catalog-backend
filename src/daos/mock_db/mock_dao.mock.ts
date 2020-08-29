@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import jsonfile from "jsonfile";
 
-import { IUser } from "../../entities/user";
+import { IUser } from "#entities/user";
 
 interface IDatabase {
   users: IUser[];

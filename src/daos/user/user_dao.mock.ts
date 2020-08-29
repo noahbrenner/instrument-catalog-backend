@@ -1,5 +1,5 @@
-import { IUser } from "@entities/user";
-import { getRandomInt } from "@shared/functions";
+import { IUser } from "#entities/user";
+import { getRandomInt } from "#shared/functions";
 import { MockDaoMock } from "../mock_db/mock_dao.mock";
 import { IUserDao } from "./user_dao";
 

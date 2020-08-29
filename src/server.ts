@@ -6,7 +6,7 @@ import express, { ErrorRequestHandler } from "express";
 import { BAD_REQUEST } from "http-status-codes";
 import "express-async-errors";
 
-import { logger } from "@shared/logger";
+import { logger } from "#shared/logger";
 import { BaseRouter } from "./routes";
 
 // Init express

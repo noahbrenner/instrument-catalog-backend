@@ -14,10 +14,10 @@
     "lib": ["ES2020"],
     "moduleResolution": "node",
     "paths": {
-      "@daos/*": ["src/daos/*"],
-      "@entities/*": ["src/entities/*"],
-      "@shared/*": ["src/shared/*"],
-      "@server": ["src/server"]
+      "#daos/*": ["src/daos/*"],
+      "#entities/*": ["src/entities/*"],
+      "#shared/*": ["src/shared/*"],
+      "#server": ["src/server"]
     },
     "types": ["node", "jest"]
   },

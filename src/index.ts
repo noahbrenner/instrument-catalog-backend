@@ -1,5 +1,5 @@
-import { app } from "@server";
-import { logger } from "@shared/logger";
+import { app } from "#server";
+import { logger } from "#shared/logger";
 
 // Start the server
 const port = Number(process.env.PORT) || 5000;

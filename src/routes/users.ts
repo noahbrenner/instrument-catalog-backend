@@ -1,8 +1,8 @@
 import { Request, Response, Router } from "express";
 import { BAD_REQUEST, CREATED, OK } from "http-status-codes";
 
-import { UserDao } from "@daos/user/user_dao.mock";
-import { paramMissingError } from "@shared/constants";
+import { UserDao } from "#daos/user/user_dao.mock";
+import { paramMissingError } from "#shared/constants";
 
 // Init shared
 const router = Router();
