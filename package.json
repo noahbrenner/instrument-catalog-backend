@@ -1,7 +1,10 @@
 {
   "name": "instrument-catalog-backend",
+  "description": "The backend for a simple wiki-ish app for sharing musical instrument descriptions",
+  "author": "Noah Brenner",
+  "version": "0.1.0",
+  "license": "MIT",
   "private": true,
-  "version": "0.0.0",
   "scripts": {
     "test": "jest --verbose",
     "lint:lint": "eslint --ignore-path .gitignore .",
@@ -13,10 +16,16 @@
     "start": "node -r module-alias/register ./dist --env=production",
     "start:dev": "nodemon"
   },
+  "main": "dist/index.js",
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
     }
+  },
+  "homepage": "https://github.com/noahbrenner/instrument-catalog-backend#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noahbrenner/instrument-catalog-backend.git"
   },
   "nodemonConfig": {
     "watch": [
