@@ -1,4 +1,5 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
+import type { Request, Response } from "express";
 import { BAD_REQUEST, CREATED, OK } from "http-status-codes";
 
 import { UserDao } from "#daos/user/user_dao.mock";
@@ -9,7 +10,7 @@ const router = Router();
 const userDao = new UserDao();
 
 /** Get All Users - "GET /api/users/all" */
-router.get("/all", async (req: Request, res: Response) => {
+router.get("/all", async (_req: Request, res: Response) => {
   const users = await userDao.getAll();
   return res.status(OK).json({ users });
 });

@@ -2,7 +2,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from "helmet";
 
-import express, { ErrorRequestHandler } from "express";
+import express from "express";
+import type { ErrorRequestHandler } from "express";
 import { BAD_REQUEST } from "http-status-codes";
 import "express-async-errors";
 
@@ -51,8 +52,7 @@ if (allowedOrigin) {
 app.use("/api", BaseRouter);
 
 // Print API errors
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Error handlers require 4 params
-app.use(((err: Error, req, res, next) => {
+app.use(((err: Error, _req, res, _next) => {
   logger.error(err.message, err);
   return res.status(BAD_REQUEST).json({
     error: err.message,

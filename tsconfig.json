@@ -1,24 +1,25 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": ".",
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": false,
-    "module": "commonjs",
-    "outDir": "dist",
-    "removeComments": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "ES2020",
+    "isolatedModules": true,
     "lib": ["ES2020"],
+    "module": "commonjs",
     "moduleResolution": "node",
+    "outDir": "dist",
     "paths": {
       "#daos/*": ["src/daos/*"],
       "#entities/*": ["src/entities/*"],
       "#shared/*": ["src/shared/*"],
-      "#server": ["src/server"]
+      "#server": ["src/server.ts"]
     },
+    "removeComments": false,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2020",
     "types": ["node", "jest"]
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"]

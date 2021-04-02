@@ -46,6 +46,19 @@ module.exports = {
       "WithStatement",
     ],
 
+    // Be explicit when an import is only used as a type
+    "@typescript-eslint/consistent-type-imports": ["error"],
+
+    // Allow unused function parameters if they start with an underscore
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { args: "all", argsIgnorePattern: "^_" },
+    ],
+
+    // Use TypeScript-aware implementation of this built-in rule
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+
     // Don't use file extensions when importing modules
     // https://github.com/benmosher/eslint-plugin-import/issues/1615
     "import/extensions": ["error", "ignorePackages", { ts: "never" }],
