@@ -8,7 +8,7 @@ services:
     volumes:
       - .:/app-backend
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT:-3000}:${PORT:-3000}"
     command: npm run start:dev
 
   frontend:
@@ -19,5 +19,5 @@ services:
     volumes:
       - ../instrument-catalog-frontend:/app-frontend
     ports:
-      - "${FRONTEND_DEVSERVER_PORT}:${FRONTEND_DEVSERVER_PORT}"
+      - "${FRONTEND_DEVSERVER_PORT:-5000}:${FRONTEND_DEVSERVER_PORT:-5000}"
     command: npm run start
