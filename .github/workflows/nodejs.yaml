@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  NODE_ENV: "development"
+  ACCESS_CONTROL_ALLOW_ORIGIN: "http://localhost:5000"
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print run info
+        run: 'echo "GitHub event: $GITHUB_EVENT_NAME"'
+      - name: Install dependencies
+        run: docker-compose run backend npm ci
+      - name: Start the server
+        run: docker-compose up backend -d
+      - run: docker-compose exec backend npm run lint:lint
+      - run: docker-compose exec backend npm run lint:types
+      - run: docker-compose exec backend npm run lint:format
+      - run: docker-compose exec backend npm run test:within-docker
+        # Right now, we're just making sure the build doesn't fail, but later we
+        # might switch to running tests directly on the JavaScript output
+      - run: docker-compose exec backend npm run build
