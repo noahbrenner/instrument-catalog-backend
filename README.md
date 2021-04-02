@@ -73,4 +73,4 @@
     - The server must be built first, so run **`$ npm run build`** before this.
     - The `.env` file is _not_ read, so environment variables must be set manually in the production environment. See `template.env` for what values need to be defined. To test locally, you can set variables manually, for example (POSIX): **`$ PORT=3000 npm start`**
   - **`$ npm run start:dev`** - Start the dev server.
-    - **You generally shouldn't run this directly.** Instead, it's run inside a Docker container when you run **`$ docker-compose up`**.
+    - **You shouldn't run this directly.** Instead, it's run inside a Docker container when you run **`$ docker-compose up`**. Docker Compose also starts the database that the server needs to work with.
