@@ -2,7 +2,6 @@ version: "3.8"
 services:
   backend:
     image: node:14.7.0-alpine
-    env_file: ./.env
     user: ${UID:-1000}:${GID:-1000}
     working_dir: /app-backend
     volumes:
@@ -13,7 +12,6 @@ services:
 
   frontend:
     image: node:14.7.0-alpine
-    env_file: ./.env
     user: ${UID:-1000}:${GID:-1000}
     working_dir: /app-frontend
     volumes:
