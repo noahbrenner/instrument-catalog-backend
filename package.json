@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "jest --verbose",
+    "test": "docker-compose run backend npx -- jest --verbose",
     "lint:lint": "eslint --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
     "lint:format": "prettier --check --ignore-path .gitignore .",

@@ -1,5 +1,7 @@
 # Instrument Catalog — backend
 
+![Tests](https://github.com/noahbrenner/instrument-catalog-backend/workflows/Tests/badge.svg)
+
 ## Dependencies
 
 - [Node.js](https://nodejs.org/) (and [`npm`](https://www.npmjs.com/get-npm), which is bundled with it)
@@ -58,8 +60,8 @@
 ### `npm` scripts
 
 - Testing/Linting/Formatting
-  - **`$ npm test`** - Run all tests using [Jest](https://jestjs.io/).
-    - Run tests in watch mode with: **`$ npm test -- --watch`**
+  - **`$ npm test`** - Run all tests using [Jest](https://jestjs.io/). The tests are run inside a Docker container.
+    - You can run tests in watch mode with: **`$ npm test -- --watch`**
   - **`$ npm run lint:lint`** - Lint codebase using [ESlint](https://eslint.org/).
     - Some linting issues can be fixed automatically with: **`$ npm run lint:lint -- --fix`**
   - **`$ npm run lint:types`** - Run static type checking for [TypeScript](https://www.typescriptlang.org/) files.

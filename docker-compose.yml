@@ -2,22 +2,20 @@ version: "3.8"
 services:
   backend:
     image: node:14.7.0-alpine
-    env_file: ./.env
     user: ${UID:-1000}:${GID:-1000}
     working_dir: /app-backend
     volumes:
       - .:/app-backend
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT:-3000}:${PORT:-3000}"
     command: npm run start:dev
 
   frontend:
     image: node:14.7.0-alpine
-    env_file: ./.env
     user: ${UID:-1000}:${GID:-1000}
     working_dir: /app-frontend
     volumes:
       - ../instrument-catalog-frontend:/app-frontend
     ports:
-      - "${FRONTEND_DEVSERVER_PORT}:${FRONTEND_DEVSERVER_PORT}"
+      - "${FRONTEND_DEVSERVER_PORT:-5000}:${FRONTEND_DEVSERVER_PORT:-5000}"
     command: npm run start
