@@ -25,7 +25,7 @@ jobs:
           echo "UID=$(id -u)" >> $GITHUB_ENV
           echo "GID=$(id -g)" >> $GITHUB_ENV
       - name: Fix npm cache permissions
-        run: sudo chown -R "$UID:$GID" /.npm
+        run: if [ -e '~/.npm' ]; then sudo chown -R "$UID:$GID" '~/.npm'; fi
       - name: Install dependencies
         run: docker-compose run backend npm ci
       - name: Start the server
