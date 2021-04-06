@@ -20,10 +20,12 @@ jobs:
       - name: Print run info
         run: 'echo "GitHub event: $GITHUB_EVENT_NAME"'
       - name: Set UID and GID environment variables
-        # This is necessary so that we can write to the filesystem inside docker
+        # Our Docker Compose file will use these values for the container's user
         run: |
           echo "UID=$(id -u)" >> $GITHUB_ENV
           echo "GID=$(id -g)" >> $GITHUB_ENV
+      - name: Fix npm cache permissions
+        run: sudo chown -R "$UID:$GID" /.npm
       - name: Install dependencies
         run: docker-compose run backend npm ci
       - name: Start the server
