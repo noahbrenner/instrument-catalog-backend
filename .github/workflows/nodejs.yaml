@@ -35,11 +35,11 @@ jobs:
         run: npm ci
       - name: Start the server
         run: docker-compose up -d backend
-      - run: docker-compose exec backend npm run lint:lint
-      - run: docker-compose exec backend npm run lint:types
-      - run: docker-compose exec backend npm run lint:format
-      - run: docker-compose exec backend npm run test:within-docker
+      - run: docker-compose exec -T backend npm run lint:lint
+      - run: docker-compose exec -T backend npm run lint:types
+      - run: docker-compose exec -T backend npm run lint:format
+      - run: docker-compose exec -T backend npm run test:within-docker
         # Right now, we're just making sure the build doesn't fail, but later we
         # might switch to running tests directly on the JavaScript output
-      - run: docker-compose exec backend npm run build
+      - run: docker-compose exec -T backend npm run build
       - run: docker-compose down
