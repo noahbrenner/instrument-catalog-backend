@@ -17,15 +17,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Use Node.js 14.x outside docker containers
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
       - name: Print run info
-        run: 'echo "GitHub event: $GITHUB_EVENT_NAME"'
+        run: |
+          echo "GitHub event: $GITHUB_EVENT_NAME"
+          echo "outer node version: $(node --version)"
+          echo "outer npm version: $(npm --version)"
       - name: Set UID and GID environment variables
         # Our Docker Compose file will use these values for the container's user
         run: |
           echo "UID=$(id -u)" >> $GITHUB_ENV
           echo "GID=$(id -g)" >> $GITHUB_ENV
       - name: Install dependencies
-        run: docker-compose run backend sh -c 'if [ -e /.npm ]; then sudo chown -R "$UID:$GID" /.npm; fi; npm ci'
+        run: npm ci
       - name: Start the server
         run: docker-compose up backend -d
       - run: docker-compose exec backend npm run lint:lint
@@ -35,3 +42,4 @@ jobs:
         # Right now, we're just making sure the build doesn't fail, but later we
         # might switch to running tests directly on the JavaScript output
       - run: docker-compose exec backend npm run build
+      - run: docker-compose down
