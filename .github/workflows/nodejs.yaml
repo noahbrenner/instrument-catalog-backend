@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 14.x outside docker containers
+      - name: Use Node.js 14.x outside of docker containers
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
@@ -33,13 +33,11 @@ jobs:
           echo "GID=$(id -g)" >> $GITHUB_ENV
       - name: Install dependencies
         run: npm ci
-      - name: Start the server
-        run: docker-compose up -d backend
-      - run: docker-compose exec -T backend npm run lint:lint
-      - run: docker-compose exec -T backend npm run lint:types
-      - run: docker-compose exec -T backend npm run lint:format
-      - run: docker-compose exec -T backend npm run test:within-docker
-        # Right now, we're just making sure the build doesn't fail, but later we
-        # might switch to running tests directly on the JavaScript output
-      - run: docker-compose exec -T backend npm run build
-      - run: docker-compose down
+      - run: npm run lint:lint
+      - run: npm run lint:types
+      - run: npm run lint:format
+      # This actually runs tests inside a docker container
+      - run: npm test
+      # Right now, we're just making sure the build doesn't fail, but later we
+      # might switch to running tests directly on the JavaScript output
+      - run: npm run build

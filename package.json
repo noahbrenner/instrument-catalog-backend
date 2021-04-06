@@ -7,7 +7,6 @@
   "private": true,
   "scripts": {
     "test": "docker-compose run backend npx -- jest --verbose",
-    "test:within-docker": "jest --verbose",
     "lint:lint": "eslint --ignore-path .gitignore .",
     "lint:types": "tsc --noEmit",
     "lint:format": "prettier --check --ignore-path .gitignore .",
