@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Start the server
-        run: docker-compose up backend -d
+        run: docker-compose up -d backend
       - run: docker-compose exec backend npm run lint:lint
       - run: docker-compose exec backend npm run lint:types
       - run: docker-compose exec backend npm run lint:format
