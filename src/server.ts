@@ -4,7 +4,7 @@ import helmet from "helmet";
 
 import express from "express";
 import type { ErrorRequestHandler } from "express";
-import { BAD_REQUEST } from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import "express-async-errors";
 
 import { logger } from "#shared/logger";
@@ -54,7 +54,7 @@ app.use("/api", BaseRouter);
 // Print API errors
 app.use(((err: Error, _req, res, _next) => {
   logger.error(err.message, err);
-  return res.status(BAD_REQUEST).json({
+  return res.status(StatusCodes.BAD_REQUEST).json({
     error: err.message,
   });
 }) as ErrorRequestHandler);
