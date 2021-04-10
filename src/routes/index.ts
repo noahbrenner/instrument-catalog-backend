@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import { UserRouter } from "./users";
 
 // Init router and path
