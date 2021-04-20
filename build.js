@@ -1,5 +1,6 @@
-const fs = require("fs-extra");
 const childProcess = require("child_process");
+
+const fs = require("fs-extra");
 
 try {
   // Remove current build

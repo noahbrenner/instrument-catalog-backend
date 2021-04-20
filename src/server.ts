@@ -1,11 +1,10 @@
 import cookieParser from "cookie-parser";
-import morgan from "morgan";
-import helmet from "helmet";
-
 import express from "express";
 import type { ErrorRequestHandler } from "express";
-import { BAD_REQUEST } from "http-status-codes";
 import "express-async-errors";
+import helmet from "helmet";
+import { StatusCodes } from "http-status-codes";
+import morgan from "morgan";
 
 import { logger } from "#shared/logger";
 import { BaseRouter } from "./routes";
@@ -54,7 +53,7 @@ app.use("/api", BaseRouter);
 // Print API errors
 app.use(((err: Error, _req, res, _next) => {
   logger.error(err.message, err);
-  return res.status(BAD_REQUEST).json({
+  return res.status(StatusCodes.BAD_REQUEST).json({
     error: err.message,
   });
 }) as ErrorRequestHandler);
