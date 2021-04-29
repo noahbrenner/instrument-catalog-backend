@@ -36,6 +36,7 @@ jobs:
       - run: npm run lint:lint
       - run: npm run lint:types
       - run: npm run lint:format
+      - run: npm run migrate up
       # This actually runs tests inside a docker container
       - run: npm test
       # Right now, we're just making sure the build doesn't fail, but later we
