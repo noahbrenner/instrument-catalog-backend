@@ -2,11 +2,18 @@
 
 ![Tests](https://github.com/noahbrenner/instrument-catalog-backend/workflows/Tests/badge.svg)
 
+This is the backend [Express](https://expressjs.com/) API server for [Instrument Catalog](https://github.com/noahbrenner/instrument-catalog-frontend), a React web app for sharing knowledge of musical instruments. The backend uses:
+
+- A [PostgreSQL](https://www.postgresql.org/) database.
+- Native SQL queries and migrations via [slonik](https://github.com/mmkal/slonik) (instead of an ORM).
+- A development/testing environment using [Docker Compose](https://www.docker.com/).
+- Tests using [Jest](https://jestjs.io/) and linting/formatting with [ESlint](https://eslint.org/), [Prettier](https://prettier.io/), and [TypeScript](https://www.typescriptlang.org/), all run via CI.
+
 ## Dependencies
 
 - [Node.js](https://nodejs.org/) (and [`npm`](https://www.npmjs.com/get-npm), which is bundled with it)
-- [Docker](https://docs.docker.com/get-docker/) (and [Docker Compose](https://docs.docker.com/compose/install/), which you'll need to do separately if you're on Linux)
-  - These are only required for development. They're not currently used for production deployment
+- [Docker](https://docs.docker.com/get-docker/) (and Docker Compose, which you'll need to [install separately](https://docs.docker.com/compose/install/) if you're on a Linux distro)
+  - Docker is only required in development, it's not currently used in production
 
 ## Project setup
 
@@ -53,25 +60,25 @@
 
 ### Docker Compose
 
-- **`$ docker-compose up`** - Start all Docker containers and processes needed during development. This includes hot reloading for both the frontend and backend. It also sets environment variables from your `.env` file inside the containers.
-  - The dev server uses [`nodemon`](https://nodemon.io/), so any code changes will be automatically compiled and the server will restart.
-  - Existing environment variables override those defined in `.env`. This allows you to easily override them in one-off commands (true for _any_ `docker-compose` command listed here). POSIX example:
+- **`$ docker-compose up`** - Start all Docker containers and processes needed during development. This includes the database as well as hot reloading for both the frontend and backend. It also sets environment variables from your `.env` file inside the containers.
+  - Existing environment variables that are referenced in `docker-compose.yml` will override those defined in `.env`. This allows you to easily override them in one-off commands (true for _any_ `docker-compose` command listed here). POSIX example:
     ```bash
     $ PORT=4000 docker-compose up
     ```
-- **`$ docker-compose up backend`** - Only start the backend dev server.
-- **`$ docker-compose up frontend`** - Only start the frontend dev server. This command isn't often useful by itself, since you could just run the frontend on its own without the overhead of a docker container.
+  - FYI: `npm run start:dev` is run inside the backend container, but you shouldn't ever need to run `start:dev` yourself.
+- **`$ docker-compose up backend`** - Only start the backend dev server (and the database, which it depends on).
+- **`$ docker-compose stop`** - Stop all containers defined for this project. You'll need to run this even if you use `ctrl-C` to interrupt `docker-compose up`, otherwise the database container may be left running.
 
 ### `npm` scripts
 
-- Testing/Linting/Formatting
+- Linting/Testing
   - **`$ npm test`** - Run all tests using [Jest](https://jestjs.io/). The tests are run inside a Docker container.
-    - You can run tests in watch mode with: **`$ npm test -- --watch`**
-  - **`$ npm run lint:lint`** - Lint codebase using [ESlint](https://eslint.org/).
-    - Some linting issues can be fixed automatically with: **`$ npm run lint:lint -- --fix`**
-  - **`$ npm run lint:types`** - Run static type checking for [TypeScript](https://www.typescriptlang.org/) files.
-  - **`$ npm run lint:format`** - Verify that formatting is consistent using [Prettier](https://prettier.io/).
-  - **`$ npm run lint`** - Run all of the above linters.
+    - Run tests in watch mode with: **`$ npm test -- --watch`**
+  - **`$ npm run lint`** - Run all linters. Each can also be run individually:
+    - **`$ npm run lint:lint`** - Lint codebase using [ESlint](https://eslint.org/).
+      - Some linting issues can be fixed automatically with: **`$ npm run lint:lint -- --fix`**
+    - **`$ npm run lint:types`** - Run static type checking for [TypeScript](https://www.typescriptlang.org/) files.
+    - **`$ npm run lint:format`** - Verify that formatting is consistent using [Prettier](https://prettier.io/).
   - **`$ npm run format`** - Reformat code using Prettier.
     - _Prettier is also run (via a git hook) whenever you make a commit._
 - Database management
