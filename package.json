@@ -14,6 +14,8 @@
     "format": "prettier --write --ignore-path .gitignore .",
     "migrate": "docker-compose run backend node -r ts-node/register/transpile-only ./migrate.ts",
     "migrate:prod": "docker-compose run -e POSTGRES_CONNECTION_STRING=\"$POSTGRES_CONNECTION_STRING\" backend node -r ts-node/register/transpile-only ./migrate.ts",
+    "seed": "docker-compose run backend node -r ts-node/register/transpile-only ./seed.ts",
+    "seed:prod": "docker-compose run -e POSTGRES_CONNECTION_STRING=\"$POSTGRES_CONNECTION_STRING\" -e NODE_ENV=production backend node -r ts-node/register/transpile-only ./seed.ts",
     "build": "node build.js",
     "start": "node -r module-alias/register ./dist --env=production",
     "start:dev": "nodemon"

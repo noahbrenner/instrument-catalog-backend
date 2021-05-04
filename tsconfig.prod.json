@@ -4,5 +4,5 @@
     "removeComments": true,
     "sourceMap": false
   },
-  "exclude": ["tests", "src/**/*.test.ts", "src/**/*.mock.ts", "migrate.ts"]
+  "exclude": ["tests", "src/**/*.test.ts", "src/**/*.mock.ts", "*.ts"]
 }
