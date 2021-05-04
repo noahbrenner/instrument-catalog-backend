@@ -8,9 +8,10 @@ updated with the values currently defined in this script. SERIAL PRIMARY KEYs
 aren't hard coded, so a row is assumed to be a duplicate if the following
 columns match exactly for the given table:
 
-  TABLE       COLUMNS
-  categories  slug
-  users       id
+  TABLE         COLUMNS
+  categories    slug
+  users         id
+  instruments   name, user_id
 
 Usage:
   seed <command>
@@ -32,6 +33,19 @@ interface ICategory {
   summary: string;
   description: string;
 }
+
+interface IInstrument {
+  id: number;
+  categoryId: ICategory["id"];
+  userId: string;
+  name: string;
+  summary: string;
+  description: string;
+  imageUrl: string;
+}
+
+export const userId1 = "seed.user|1";
+export const userId2 = "seed.user|2";
 
 export async function seedCategories(): Promise<void> {
   const categories: Omit<ICategory, "id">[] = [
@@ -70,14 +84,96 @@ export async function seedUsers(): Promise<void> {
     INSERT INTO
       users (id)
     VALUES
-      (${"seed.user/1"}),
-      (${"seed.user/2"})
+      (${userId1}),
+      (${userId2})
     ON CONFLICT DO NOTHING;
   `);
 }
 
+export async function seedInstruments(): Promise<void> {
+  let stringsId: number;
+  let windsId: number;
+  try {
+    [stringsId, windsId] = await pool.manyFirst<number>(sql`
+      SELECT id FROM categories
+      ORDER BY array_position(ARRAY['strings', 'winds']::varchar[], slug);
+    `);
+  } catch (err) {
+    console.error("Error: You must seed categories before seeding instruments");
+    throw err;
+  }
+
+  const instruments: Omit<IInstrument, "id">[] = [
+    {
+      categoryId: windsId,
+      userId: userId1,
+      name: "Flute",
+      summary: "Flute summary",
+      description: "Flute description",
+      imageUrl: "",
+    },
+    {
+      categoryId: stringsId,
+      userId: userId2,
+      name: "Double Bass",
+      summary: "Double Bass summary",
+      description: "Double Bass description",
+      imageUrl: "",
+    },
+  ];
+
+  await pool.transaction(async (connection) => {
+    // We can't use an ON CONFLICT clause for these upserts because there's no
+    // unique constraint on `(user_id, name)` or its components, so we need to
+    // manually query an instrument and then conditionally update or insert it.
+    const upserts = instruments.map(
+      async ({ categoryId, userId, name, summary, description, imageUrl }) => {
+        const instrumentId = await connection.maybeOneFirst<number>(sql`
+          SELECT id FROM instruments
+          WHERE user_id = ${userId} AND name = ${name};
+        `);
+
+        if (instrumentId === null) {
+          await connection.query(sql`
+            INSERT INTO
+              instruments (
+                category_id,
+                user_id,
+                name,
+                summary,
+                description,
+                image_url
+              )
+            VALUES (
+              ${categoryId},
+              ${userId},
+              ${name},
+              ${summary},
+              ${description},
+              ${imageUrl}
+            );
+          `);
+        } else {
+          await connection.query(sql`
+            UPDATE
+              instruments
+            SET
+              category_id = ${categoryId},
+              summary = ${summary},
+              description = ${description},
+              image_url = ${imageUrl}
+            WHERE id = ${instrumentId};
+          `);
+        }
+      }
+    );
+    await Promise.all(upserts);
+  });
+}
+
 export async function seedAllTables(): Promise<void> {
   await Promise.all([seedCategories(), seedUsers()]);
+  await seedInstruments();
 }
 
 export async function truncateAllTables(): Promise<void> {
