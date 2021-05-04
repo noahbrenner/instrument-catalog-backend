@@ -94,6 +94,15 @@ This is the backend [Express](https://expressjs.com/) API server for [Instrument
         $ export GID=$(id -g)
         $ npm run migrate create foo
         ```
+  - Seed data. The logic is in `seed.ts` but you'll run it via `npm`, which handles executing the script inside a Docker container.
+    - **`$ npm run seed help`** - Print a help message that gives you a little more information about running the script.
+    - Non-destructive upserts (insert or update to match definitions in `seed.ts`, but don't delete existing rows):
+      - **`$ npm run seed all`** - Seed all database tables. This includes `categories`, `users`, and `instruments`.
+      - **`$ npm run seed categories`** - Only seed the `categories` table.
+        - _Note that there are no scripts for updating `users` or `instruments` individually._
+    - Destructive commands:
+      - **`$ npm run seed truncate`** - Remove all data from all tables.
+      - **`$ npm run seed reset`** - Truncate, then seed all tables.
 
 ## Commands used for production
 
@@ -102,8 +111,11 @@ This is the backend [Express](https://expressjs.com/) API server for [Instrument
   - This executes the compiled JavaScript, so you need to run **`$ npm run build`** first.
   - The server expects to be able to connect to a PostgreSQL database using the value of the `POSTGRES_CONNECTION_STRING` environment variable, so the database must be set up first and the connection string must be provided in the environment.
   - The `.env` file is _not_ read, so environment variables must be set manually on the production server. See `template.env` for what values need to be defined. To test locally, you can set variables manually, for example (POSIX): **`$ PORT=3000 npm start`**
-- **`$ npm run migrate:prod <command>`** - Run migrations on a production database.
-  - This command and its usage is (almost) identical to `npm run migrate`, including the fact that it executes the underlying command inside a Docker container (so it requires Docker Compose to be installed and it can be run from your local machine). The difference is that you can override the `POSTGRES_CONNECTION_STRING` environment variable, which is otherwise set programmatically in `docker-compose.yml`. In a POSIX terminal, you can do this on one line:
-    ```bash
-    $ POSTGRES_CONNECTION_STRING=postgresql://foo:bar@baz:1337/buzz npm run migrate:prod up
-    ```
+- **Database management** - These commands are almost identical to their dev variations (without `:prod`). They still execute the underlying command inside a Docker container, and thus require Docker Compose to be installed. They may be run from your local machine. However, these commands allow setting the `POSTGRES_CONNECTION_STRING` environment variable in order to connect to the production DB. In a POSIX terminal, you can set the variable and run the command in one line:
+  ```bash
+  $ POSTGRES_CONNECTION_STRING=postgresql://foo:bar@baz:1337/buzz npm run <npm_script>
+  ```
+  - **`$ npm run migrate:prod <command>`** - Run migrations on a production database.
+  - **`$ npm run seed:prod <command>`** - Seed/upsert data into a production database.
+    - This command doesn't allow the destructive `truncate` or `reset` subcommands; it will throw an error when calling them.
+    - **`$ npm run seed:prod categories`** may be useful when you want to update category summaries or descriptions without touching the other tables. Seeded _instruments_ can be updated or deleted through the frontend UI by logging in as an admin.
