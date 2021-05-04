@@ -91,16 +91,16 @@ export async function seedUsers(): Promise<void> {
 }
 
 export async function seedInstruments(): Promise<void> {
-  let stringsId: number;
-  let windsId: number;
-  try {
-    [stringsId, windsId] = await pool.manyFirst<number>(sql`
-      SELECT id FROM categories
-      ORDER BY array_position(ARRAY['strings', 'winds']::varchar[], slug);
-    `);
-  } catch (err) {
-    console.error("Error: You must seed categories before seeding instruments");
-    throw err;
+  const [stringsId, windsId] = await Promise.all(
+    ["strings", "winds"].map((slug) =>
+      pool.maybeOneFirst<number>(
+        sql`SELECT id FROM categories WHERE slug = ${slug};`
+      )
+    )
+  );
+
+  if (stringsId === null || windsId === null) {
+    throw new Error("You must seed categories before seeding instruments.");
   }
 
   const instruments: Omit<IInstrument, "id">[] = [
