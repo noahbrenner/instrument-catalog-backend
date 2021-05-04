@@ -16,8 +16,12 @@ Usage:
 
 Commands:
   help          Show this message
+
   all           Seed categories, users, and instruments
   categories    Seed categories
+
+  truncate      Empty all tables (errors if NODE_ENV=production)
+  reset         Empty all tables and reseed (errors if NODE_ENV=production)
 `;
 
 interface ICategory {
@@ -63,6 +67,20 @@ export async function seedAllTables(): Promise<void> {
   await seedCategories();
 }
 
+export async function truncateAllTables(): Promise<void> {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Don't truncate tables in production!");
+  }
+  await pool.query(
+    sql`TRUNCATE TABLE categories, users, instruments RESTART IDENTITY;`
+  );
+}
+
+export async function resetAllTables(): Promise<void> {
+  await truncateAllTables();
+  await seedAllTables();
+}
+
 async function main() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_node, _thisModule, ...args] = process.argv;
@@ -77,6 +95,10 @@ async function main() {
       return seedAllTables();
     case "categories":
       return seedCategories();
+    case "truncate":
+      return truncateAllTables();
+    case "reset":
+      return resetAllTables();
     case "help":
       return console.log(help);
     default:
