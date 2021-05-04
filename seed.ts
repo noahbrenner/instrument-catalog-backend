@@ -10,6 +10,7 @@ columns match exactly for the given table:
 
   TABLE       COLUMNS
   categories  slug
+  users       id
 
 Usage:
   seed <command>
@@ -49,7 +50,8 @@ export async function seedCategories(): Promise<void> {
   ];
 
   await pool.query(sql`
-    INSERT INTO categories (name, slug, summary, description)
+    INSERT INTO
+      categories (name, slug, summary, description)
     SELECT *
     FROM ${sql.unnest(
       categories.map((c) => [c.name, c.slug, c.summary, c.description]),
@@ -63,8 +65,19 @@ export async function seedCategories(): Promise<void> {
   `);
 }
 
+export async function seedUsers(): Promise<void> {
+  await pool.query(sql`
+    INSERT INTO
+      users (id)
+    VALUES
+      (${"seed.user/1"}),
+      (${"seed.user/2"})
+    ON CONFLICT DO NOTHING;
+  `);
+}
+
 export async function seedAllTables(): Promise<void> {
-  await seedCategories();
+  await Promise.all([seedCategories(), seedUsers()]);
 }
 
 export async function truncateAllTables(): Promise<void> {
