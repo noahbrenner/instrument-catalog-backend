@@ -32,7 +32,7 @@ interface ICategory {
   description: string;
 }
 
-export function seedCategories(): ReturnType<typeof pool.query> {
+export async function seedCategories(): Promise<void> {
   const categories: Omit<ICategory, "id">[] = [
     {
       name: "Strings",
@@ -48,7 +48,7 @@ export function seedCategories(): ReturnType<typeof pool.query> {
     },
   ];
 
-  return pool.query(sql`
+  await pool.query(sql`
     INSERT INTO categories (name, slug, summary, description)
     SELECT *
     FROM ${sql.unnest(
