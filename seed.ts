@@ -59,7 +59,7 @@ export function seedCategories(): ReturnType<typeof pool.query> {
   `);
 }
 
-export async function seedAll(): Promise<void> {
+export async function seedAllTables(): Promise<void> {
   await seedCategories();
 }
 
@@ -67,13 +67,14 @@ async function main() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_node, _thisModule, ...args] = process.argv;
   if (args.length !== 1) {
+    console.error("seed only accepts one argument\n");
     console.error(help);
     process.exit(1);
   }
 
   switch (args[0]) {
     case "all":
-      return seedAll();
+      return seedAllTables();
     case "categories":
       return seedCategories();
     case "help":
