@@ -47,4 +47,4 @@ router.delete("/delete/:id", async (req: Request, res: Response) => {
   return res.status(OK).end();
 });
 
-export { router as UserRouter };
+export { router as userRouter };
