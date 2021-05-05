@@ -48,7 +48,7 @@ if (allowedOrigin) {
 }
 
 // Add APIs
-app.use("/api", baseRouter);
+app.use("/", baseRouter);
 
 // Print API errors
 app.use(((err: Error, _req, res, _next) => {
