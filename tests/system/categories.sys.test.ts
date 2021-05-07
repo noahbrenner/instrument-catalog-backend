@@ -1,5 +1,6 @@
 import request from "supertest";
 
+import { truncateAllTables } from "#seed";
 import { app } from "#server";
 
 function expectValidCategory(obj: unknown) {
@@ -20,6 +21,13 @@ describe("GET /categories/all", () => {
     expect(res.body).toEqual({ categories: expect.any(Array) });
     expect(res.body.categories.length).toBeGreaterThan(0);
     res.body.categories.forEach(expectValidCategory);
+  });
+
+  it("returns an empty array if there are no categories", async () => {
+    await truncateAllTables();
+    const res = await request(app).get("/categories/all");
+    expect(res).toMatchObject({ status: 200, type: "application/json" });
+    expect(res.body).toEqual({ categories: [] });
   });
 });
 
