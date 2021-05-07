@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 
 import { logger } from "#shared/logger";
-import { BaseRouter } from "./routes";
+import { baseRouter } from "./routes";
 
 // Init express
 const app = express();
@@ -48,7 +48,7 @@ if (allowedOrigin) {
 }
 
 // Add APIs
-app.use("/api", BaseRouter);
+app.use("/", baseRouter);
 
 // Print API errors
 app.use(((err: Error, _req, res, _next) => {

@@ -11,8 +11,7 @@
     "moduleResolution": "node",
     "outDir": "dist",
     "paths": {
-      "#daos/*": ["src/daos/*"],
-      "#entities/*": ["src/entities/*"],
+      "#db/*": ["src/db/*"],
       "#shared/*": ["src/shared/*"],
       "#server": ["src/server.ts"]
     },
