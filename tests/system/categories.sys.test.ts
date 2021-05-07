@@ -48,7 +48,7 @@ describe("GET /categories/:slug", () => {
     expect(res.body).toMatchObject({ slug: "winds", name: "Winds" });
   });
 
-  it("returns a 404 for a nonexistent category", async () => {
+  it("returns a NOT FOUND response for a nonexistent category", async () => {
     const res = await request(app).get("/categories/nonexistent");
     expect(res).toMatchObject({ status: 404, type: "application/json" });
   });

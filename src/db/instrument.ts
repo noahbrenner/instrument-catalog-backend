@@ -69,3 +69,17 @@ export async function getAllInstruments(): Promise<IInstrument[]> {
     throw err;
   }
 }
+
+export async function getInstrumentById(
+  id: number
+): Promise<IInstrument | null> {
+  const instrument = await pool.maybeOne<DBInstrument>(sql`
+    SELECT ${allColumns}
+    FROM instruments
+    WHERE id = ${id};
+  `);
+  if (instrument === null) {
+    return null;
+  }
+  return dbToJsonInstrument(instrument);
+}

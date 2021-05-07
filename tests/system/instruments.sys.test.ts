@@ -32,3 +32,27 @@ describe("GET /instruments/all", () => {
     expect(res.body).toEqual({ instruments: [] });
   });
 });
+
+describe("GET /instruments/:id", () => {
+  it("returns a valid instrument for /instruments/1", async () => {
+    const res = await request(app).get("/instruments/1");
+    expect(res).toMatchObject({ status: 200, type: "application/json" });
+    expectValidInstrument(res.body);
+  });
+
+  it("returns a NOT FOUND response for a nonexistent id", async () => {
+    await truncateAllTables();
+    const res = await request(app).get("/instruments/1");
+    expect(res).toMatchObject({ status: 404, type: "application/json" });
+  });
+
+  it("returns a BAD REQUEST responses for invalid ids", async () => {
+    const badIds = ["-1", "1.0", "1foo", "bar1"];
+    const requests = await Promise.all(
+      badIds.map((badId) => request(app).get(`/instruments/${badId}`))
+    );
+    requests.forEach((res) => {
+      expect(res).toMatchObject({ status: 400, type: "application/json" });
+    });
+  });
+});
