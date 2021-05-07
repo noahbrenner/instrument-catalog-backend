@@ -22,3 +22,26 @@ describe("GET /categories/all", () => {
     res.body.categories.forEach(expectValidCategory);
   });
 });
+
+describe("GET /categories/:slug", () => {
+  it("returns a valid category for /categories/winds", async () => {
+    const res = await request(app).get("/categories/winds");
+    expect(res).toMatchObject({ status: 200, type: "application/json" });
+
+    expectValidCategory(res.body);
+    expect(res.body).toMatchObject({ slug: "winds", name: "Winds" });
+  });
+
+  it("accepts incorrect capitalizations of the category slug", async () => {
+    const res = await request(app).get("/categories/WiNdS");
+    expect(res).toMatchObject({ status: 200, type: "application/json" });
+
+    expectValidCategory(res.body);
+    expect(res.body).toMatchObject({ slug: "winds", name: "Winds" });
+  });
+
+  it("returns a 404 for a nonexistent category", async () => {
+    const res = await request(app).get("/categories/nonexistent");
+    expect(res).toMatchObject({ status: 404, type: "application/json" });
+  });
+});

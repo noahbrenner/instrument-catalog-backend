@@ -39,3 +39,11 @@ export async function getAllCategories(): Promise<ICategory[]> {
     throw err;
   }
 }
+
+export function getCategoryBySlug(slug: string): Promise<ICategory | null> {
+  return pool.maybeOne<ICategory>(sql`
+    SELECT ${allColumns}
+    FROM categories
+    WHERE slug = ${slug};
+  `);
+}
