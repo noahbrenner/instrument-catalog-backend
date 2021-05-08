@@ -55,7 +55,7 @@ router.get("/:id", async (req, res) => {
   const instrument = await getInstrumentById(instrumentId);
 
   if (instrument === null) {
-    const error = `Instrument not found with id: ${instrumentId}`;
+    const error = `No instrument found with id: ${instrumentId}`;
     res.status(StatusCodes.NOT_FOUND).json({ error });
   } else {
     res.status(StatusCodes.OK).json(instrument);

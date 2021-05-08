@@ -86,16 +86,16 @@ describe("GET /instruments/:id", () => {
     expectValidInstrument(res.body);
   });
 
-  it("returns a NOT FOUND response for a nonexistent id", async () => {
+  it("returns a NOT FOUND response for a nonexistent ID", async () => {
     await truncateInstrumentsTable();
     const res = await request(app).get("/instruments/1");
     expect(res).toMatchObject({ status: 404, type: "application/json" });
   });
 
-  it("returns a BAD REQUEST responses for invalid ids", async () => {
-    const badIds = ["-1", "1.0", "1foo", "bar1"];
+  it("returns BAD REQUEST responses for invalid IDs", async () => {
+    const invalidIds = ["-1", "1.0", "1foo", "bar1"];
     const requests = await Promise.all(
-      badIds.map((badId) => request(app).get(`/instruments/${badId}`))
+      invalidIds.map((id) => request(app).get(`/instruments/${id}`))
     );
     requests.forEach((res) => {
       expect(res).toMatchObject({ status: 400, type: "application/json" });
