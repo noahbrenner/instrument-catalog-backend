@@ -1,12 +1,46 @@
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 
-import { getAllInstruments, getInstrumentById } from "#db/instrument";
+import { categoryIdExists } from "#db/category";
+import {
+  getAllInstruments,
+  getInstrumentById,
+  getInstrumentsByCategoryId,
+} from "#db/instrument";
 
 const router = Router();
 
 router.get("/all", async (_req, res) => {
   const instruments = await getAllInstruments();
+  res.status(StatusCodes.OK).json({ instruments });
+});
+
+/** GET /instruments?cat=<category_id> */
+router.get("/", async (req, res) => {
+  const rawCategoryId = req.query.cat;
+
+  if (rawCategoryId === undefined) {
+    const error = 'Endpoint requires an instrument ID, category ID or "/all".';
+    res.status(StatusCodes.BAD_REQUEST).json({ error });
+    return;
+  }
+
+  if (typeof rawCategoryId !== "string" || !/^[0-9]+$/.test(rawCategoryId)) {
+    const error = "Category ID must be an integer";
+    res.status(StatusCodes.BAD_REQUEST).json({ error });
+    return;
+  }
+
+  const categoryId = Number(rawCategoryId);
+  const categoryExists = await categoryIdExists(categoryId);
+
+  if (!categoryExists) {
+    const error = `No category found with id: ${categoryId}`;
+    res.status(StatusCodes.NOT_FOUND).json({ error });
+    return;
+  }
+
+  const instruments = await getInstrumentsByCategoryId(categoryId);
   res.status(StatusCodes.OK).json({ instruments });
 });
 

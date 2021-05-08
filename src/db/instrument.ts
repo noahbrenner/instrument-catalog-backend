@@ -70,6 +70,26 @@ export async function getAllInstruments(): Promise<IInstrument[]> {
   }
 }
 
+export async function getInstrumentsByCategoryId(
+  categoryId: number
+): Promise<IInstrument[]> {
+  try {
+    return (
+      await pool.many<DBInstrument>(sql`
+        SELECT ${allColumns}
+        FROM instruments
+        WHERE category_id = ${categoryId}
+        ORDER BY name;
+      `)
+    ).map(dbToJsonInstrument);
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      return [];
+    }
+    throw err;
+  }
+}
+
 export async function getInstrumentById(
   id: number
 ): Promise<IInstrument | null> {

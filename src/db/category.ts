@@ -47,3 +47,11 @@ export function getCategoryBySlug(slug: string): Promise<ICategory | null> {
     WHERE slug = ${slug};
   `);
 }
+
+export function categoryIdExists(id: number): Promise<boolean> {
+  return pool.exists(sql`
+    SELECT id
+    FROM categories
+    WHERE id = ${id}
+  `); // The ";" must be omitted because this is wrapped inside another query
+}
