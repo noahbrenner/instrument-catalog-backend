@@ -4,7 +4,6 @@ import { pool, sql } from ".";
 
 // I prefer `interface` over `type`, but Slonik has a type bug preventing that:
 // https://github.com/gajus/slonik/issues/268
-/** The JSON object shape for instruments to be returned by our API */
 type IInstrument = {
   id: number;
   categoryId: number;
@@ -15,53 +14,31 @@ type IInstrument = {
   imageUrl: string;
 };
 
-/** A mapping of column names in the `instruments` table */
-type DBInstrument = {
-  id: IInstrument["id"];
-  category_id: IInstrument["categoryId"]; // eslint-disable-line camelcase
-  user_id: IInstrument["userId"]; // eslint-disable-line camelcase
-  name: IInstrument["name"];
-  summary: IInstrument["summary"];
-  description: IInstrument["description"];
-  image_url: IInstrument["imageUrl"]; // eslint-disable-line camelcase
-};
-
-const columnNames: Array<keyof DBInstrument> = [
-  "id",
-  "category_id",
-  "user_id",
-  "name",
-  "summary",
-  "description",
-  "image_url",
+const columnNames: [dbColumn: string, jsonKey: keyof IInstrument][] = [
+  ["id", "id"],
+  ["category_id", "categoryId"],
+  ["user_id", "userId"],
+  ["name", "name"],
+  ["summary", "summary"],
+  ["description", "description"],
+  ["image_url", "imageUrl"],
 ];
 
 const allColumns = sql.join(
-  columnNames.map((col) => sql.identifier([col])),
+  columnNames.map(
+    ([dbColumn, jsonKey]) =>
+      sql`${sql.identifier([dbColumn])} AS ${sql.identifier([jsonKey])}`
+  ),
   sql`,`
 );
 
-export function dbToJsonInstrument({
-  id,
-  category_id: categoryId,
-  user_id: userId,
-  name,
-  summary,
-  description,
-  image_url: imageUrl,
-}: DBInstrument): IInstrument {
-  return { id, categoryId, userId, name, summary, description, imageUrl };
-}
-
 export async function getAllInstruments(): Promise<IInstrument[]> {
   try {
-    return (
-      await pool.many<DBInstrument>(sql`
-        SELECT ${allColumns}
-        FROM instruments
-        ORDER BY name;
-      `)
-    ).map(dbToJsonInstrument);
+    return (await pool.many<IInstrument>(sql`
+      SELECT ${allColumns}
+      FROM instruments
+      ORDER BY name;
+    `)) as IInstrument[]; // Slonik types the result as `readonly IInstrument[]`
   } catch (err) {
     if (err instanceof NotFoundError) {
       return [];
@@ -74,14 +51,12 @@ export async function getInstrumentsByCategoryId(
   categoryId: number
 ): Promise<IInstrument[]> {
   try {
-    return (
-      await pool.many<DBInstrument>(sql`
-        SELECT ${allColumns}
-        FROM instruments
-        WHERE category_id = ${categoryId}
-        ORDER BY name;
-      `)
-    ).map(dbToJsonInstrument);
+    return (await pool.many<IInstrument>(sql`
+      SELECT ${allColumns}
+      FROM instruments
+      WHERE category_id = ${categoryId}
+      ORDER BY name;
+    `)) as IInstrument[]; // Slonik types the result as `readonly IInstrument[]`
   } catch (err) {
     if (err instanceof NotFoundError) {
       return [];
@@ -90,16 +65,10 @@ export async function getInstrumentsByCategoryId(
   }
 }
 
-export async function getInstrumentById(
-  id: number
-): Promise<IInstrument | null> {
-  const instrument = await pool.maybeOne<DBInstrument>(sql`
+export function getInstrumentById(id: number): Promise<IInstrument | null> {
+  return pool.maybeOne<IInstrument>(sql`
     SELECT ${allColumns}
     FROM instruments
     WHERE id = ${id};
   `);
-  if (instrument === null) {
-    return null;
-  }
-  return dbToJsonInstrument(instrument);
 }
