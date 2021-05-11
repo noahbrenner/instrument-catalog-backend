@@ -50,8 +50,8 @@ export function getCategoryBySlug(slug: string): Promise<ICategory | null> {
 
 export function categoryIdExists(id: number): Promise<boolean> {
   return pool.exists(sql`
-    SELECT id
+    SELECT 1
     FROM categories
     WHERE id = ${id}
-  `); // The ";" must be omitted because this is wrapped inside another query
+  `); // There's no ";" in this SQL because it's wrapped inside another query
 }
