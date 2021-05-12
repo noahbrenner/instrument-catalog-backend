@@ -51,22 +51,27 @@ router.get("/test", requireAuth, (req, res) => {
   res.status(200).json({ userId, isAdmin });
 });
 
-router.get<{ id: string }>("/:id", async (req, res) => {
-  if (!/^[0-9]+$/.test(req.params.id)) {
-    const error = "Instrument ID must be an integer.";
-    res.status(StatusCodes.BAD_REQUEST).json({ error });
-    return;
-  }
+router
+  .route("/:id")
+  /** Validate the instrument ID format for all methods */
+  .all<{ id: string }>((req, res, next) => {
+    if (/^[0-9]+$/.test(req.params.id)) {
+      next();
+    } else {
+      const error = "Instrument ID must be an integer.";
+      res.status(StatusCodes.BAD_REQUEST).json({ error });
+    }
+  })
+  .get<{ id: string }>(async (req, res) => {
+    const instrumentId = Number(req.params.id);
+    const instrument = await getInstrumentById(instrumentId);
 
-  const instrumentId = Number(req.params.id);
-  const instrument = await getInstrumentById(instrumentId);
-
-  if (instrument === null) {
-    const error = `No instrument found with id: ${instrumentId}`;
-    res.status(StatusCodes.NOT_FOUND).json({ error });
-  } else {
-    res.status(StatusCodes.OK).json(instrument);
-  }
-});
+    if (instrument === null) {
+      const error = `No instrument found with id: ${instrumentId}`;
+      res.status(StatusCodes.NOT_FOUND).json({ error });
+    } else {
+      res.status(StatusCodes.OK).json(instrument);
+    }
+  });
 
 export { router as instrumentRouter };

@@ -20,19 +20,6 @@ interface PartialAuthRequest extends AuthRequest {
     Partial<Pick<AuthRequest["user"], "id" | "isAdmin">>;
 }
 
-/**
- * Throws if user is unauthenticated, otherwise populates req.user
- *
- * Usage:
- *   import { requireAuth, assertAuthRequest } from "#shared/auth";
- *
- *   router.use("/needs-auth", requireAuth, (req, res) => {
- *     assertAuthRequest(req); // req is now typed as AuthRequest
- *     doThingsWith(req.user.id, req.user.isAdmin);
- *   });
- */
-export const requireAuth = Router();
-
 /** Throw if the initial values from checkJwt have not been populated */
 function assertPartialAuthRequest(
   req: Request | PartialAuthRequest
@@ -67,10 +54,21 @@ const checkJwt = jwt({
   algorithms: ["RS256"],
 });
 
-requireAuth.use(checkJwt, ((req, _res, next) => {
+/**
+ * Throws if user is unauthenticated, otherwise populates req.user
+ *
+ * Usage:
+ *   import { requireAuth, assertAuthRequest } from "#shared/auth";
+ *
+ *   router.use("/needs-auth", requireAuth, (req, res) => {
+ *     assertAuthRequest(req); // req is now typed as AuthRequest
+ *     doThingsWith(req.user.id, req.user.isAdmin);
+ *   });
+ */
+export const requireAuth = Router().use(checkJwt, ((req, _res, next) => {
   assertPartialAuthRequest(req);
   const roles = req.user["http:auth/roles"];
   req.user.isAdmin = Array.isArray(roles) && roles.includes("admin");
-  req.user.id = req.user?.sub;
+  req.user.id = req.user.sub;
   return next();
 }) as RequestHandler);
