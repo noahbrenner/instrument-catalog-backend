@@ -51,7 +51,7 @@ router.get("/test", requireAuth, (req, res) => {
   res.status(200).json({ userId, isAdmin });
 });
 
-router.get("/:id", async (req, res) => {
+router.get<{ id: string }>("/:id", async (req, res) => {
   if (!/^[0-9]+$/.test(req.params.id)) {
     const error = "Instrument ID must be an integer.";
     res.status(StatusCodes.BAD_REQUEST).json({ error });

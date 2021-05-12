@@ -10,7 +10,7 @@ router.get("/all", async (_req, res) => {
   res.status(StatusCodes.OK).json({ categories });
 });
 
-router.get("/:slug", async (req, res) => {
+router.get<{ slug: string }>("/:slug", async (req, res) => {
   const categorySlug = req.params.slug.toLowerCase();
   const category = await getCategoryBySlug(categorySlug);
 
