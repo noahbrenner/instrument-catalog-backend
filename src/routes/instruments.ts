@@ -7,6 +7,7 @@ import {
   getInstrumentById,
   getInstrumentsByCategoryId,
 } from "#db/instrument";
+import { assertAuthRequest, requireAuth } from "#shared/auth";
 
 const router = Router();
 
@@ -42,6 +43,12 @@ router.get("/", async (req, res) => {
 
   const instruments = await getInstrumentsByCategoryId(categoryId);
   res.status(StatusCodes.OK).json({ instruments });
+});
+
+router.get("/test", requireAuth, (req, res) => {
+  assertAuthRequest(req);
+  const { id: userId, isAdmin } = req.user;
+  res.status(200).json({ userId, isAdmin });
 });
 
 router.get("/:id", async (req, res) => {

@@ -2,6 +2,11 @@ import request from "supertest";
 
 import { pool, sql } from "#db/index";
 import { app } from "#server";
+import {
+  userAccessToken,
+  adminAccessToken,
+  invalidAccessToken,
+} from "../mocks/auth_server";
 
 function expectValidInstrument(obj: unknown) {
   expect(obj).toEqual({
@@ -100,5 +105,37 @@ describe("GET /instruments/:id", () => {
     requests.forEach((res) => {
       expect(res).toMatchObject({ status: 400, type: "application/json" });
     });
+  });
+});
+
+describe("GET /instruments/test", () => {
+  it("authenticates a standard user", async () => {
+    const res = await request(app)
+      .get("/instruments/test")
+      .set("Authorization", `Bearer ${userAccessToken}`);
+    expect(res).toMatchObject({ status: 200, type: "application/json" });
+    expect(res.body).toEqual({ userId: "seed.user|1", isAdmin: false });
+  });
+
+  it("authenticates an admin user", async () => {
+    const res = await request(app)
+      .get("/instruments/test")
+      .set("Authorization", `Bearer ${adminAccessToken}`);
+    expect(res).toMatchObject({ status: 200, type: "application/json" });
+    expect(res.body).toEqual({ userId: "seed.user|99", isAdmin: true });
+  });
+
+  it("does not authenticate for an invalid access token", async () => {
+    const res = await request(app)
+      .get("/instruments/test")
+      .set("Authorization", `Bearer ${invalidAccessToken}`);
+    expect(res).toMatchObject({ status: 400, type: "application/json" });
+    expect(res.body).toEqual({ error: expect.any(String) });
+  });
+
+  it("does not authenticate without an access token", async () => {
+    const res = await request(app).get("/instruments/test");
+    expect(res).toMatchObject({ status: 400, type: "application/json" });
+    expect(res.body).toEqual({ error: expect.any(String) });
   });
 });
