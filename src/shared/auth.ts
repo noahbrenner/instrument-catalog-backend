@@ -42,7 +42,7 @@ export function assertAuthRequest(
   }
 }
 
-const { AUTH0_DOMAIN } = process.env;
+const { AUTH0_DOMAIN, AUTH0_BACKEND_API_IDENTIFIER } = process.env;
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
@@ -50,6 +50,7 @@ const checkJwt = jwt({
     jwksRequestsPerMinute: 5,
     jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`,
   }),
+  audience: AUTH0_BACKEND_API_IDENTIFIER,
   issuer: [`https://${AUTH0_DOMAIN}/`],
   algorithms: ["RS256"],
 });

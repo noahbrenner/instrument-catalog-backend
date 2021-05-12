@@ -31,7 +31,7 @@ SDOxQ4G/523Y0sz/OZtSWcol/UMgQJALesy++GdvoIDLfJX5GBQpuFgFenRiRDa
 bxrE9MNUZ2aPFaFp+DyAe+b4nDwuJaW2LURbr8AEZga7oQj0uYxcYw==
 -----END RSA PRIVATE KEY-----`;
 
-const { AUTH0_DOMAIN } = process.env;
+const { AUTH0_DOMAIN, AUTH0_BACKEND_API_IDENTIFIER } = process.env;
 const correctKid = "123";
 const incorrectKid = "456";
 
@@ -48,6 +48,7 @@ export const userAccessToken = jws.sign({
   header: { alg: "RS256", typ: "JWT", kid: correctKid },
   payload: {
     sub: "seed.user|1",
+    aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
     iss: `https://${AUTH0_DOMAIN}/`, // Issuer
   },
 });
@@ -59,6 +60,7 @@ export const adminAccessToken = jws.sign({
   payload: {
     sub: "seed.user|99",
     "http:auth/roles": ["admin"],
+    aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
     iss: `https://${AUTH0_DOMAIN}/`, // Issuer
   },
 });
@@ -70,6 +72,7 @@ export const invalidAccessToken = jws.sign({
   payload: {
     sub: "seed.user|1",
     "http:auth/roles": ["admin"],
+    aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
     iss: `https://${AUTH0_DOMAIN}/`, // Issuer
   },
 });
