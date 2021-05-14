@@ -84,6 +84,65 @@ describe("GET /instruments?cat=<category_id>", () => {
   });
 });
 
+describe.only("POST|PUT|DELETE /instruments/*", () => {
+  it("returns BAD REQUEST for an invalid access token", async () => {
+    const authHeader = [
+      "Authorization",
+      `Bearer ${invalidAccessToken}`,
+    ] as const;
+
+    const requests = await Promise.all([
+      request(app)
+        .delete("/instruments/1")
+        .set(...authHeader),
+    ]);
+
+    requests.forEach((res) => {
+      expect(res).toMatchObject({ status: 400, type: "application/json" });
+    });
+  });
+
+  it("returns BAD REQUEST for a missing access token", async () => {
+    const requests = await Promise.all([
+      request(app).delete("/instruments/1"),
+    ]);
+
+    requests.forEach((res) => {
+      expect(res).toMatchObject({ status: 400, type: "application/json" });
+    });
+  });
+});
+
+describe.only("GET|PUT|DELETE /instruments/:id", () => {
+  it("returns BAD REQUEST responses for invalid IDs", async () => {
+    const invalidIds = ["-1", "1.0", "1foo", "bar1"];
+    const authHeader = ["Authorization", `Bearer ${userAccessToken}`] as const;
+
+    const requests = await Promise.all([
+      // GET
+      ...invalidIds.map((id) => request(app).get(`/instruments/${id}`)),
+
+      // PUT
+      ...invalidIds.map((id) =>
+        request(app)
+          .put(`/instruments/${id}`)
+          .set(...authHeader)
+      ),
+
+      // DELETE
+      ...invalidIds.map((id) =>
+        request(app)
+          .delete(`/instruments/${id}`)
+          .set(...authHeader)
+      ),
+    ]);
+
+    requests.forEach((res) => {
+      expect(res).toMatchObject({ status: 400, type: "application/json" });
+    });
+  });
+});
+
 describe("GET /instruments/:id", () => {
   it("returns a valid instrument for /instruments/1", async () => {
     const res = await request(app).get("/instruments/1");
@@ -96,15 +155,62 @@ describe("GET /instruments/:id", () => {
     const res = await request(app).get("/instruments/1");
     expect(res).toMatchObject({ status: 404, type: "application/json" });
   });
+});
 
-  it("returns BAD REQUEST responses for invalid IDs", async () => {
-    const invalidIds = ["-1", "1.0", "1foo", "bar1"];
-    const requests = await Promise.all(
-      invalidIds.map((id) => request(app).get(`/instruments/${id}`))
-    );
-    requests.forEach((res) => {
-      expect(res).toMatchObject({ status: 400, type: "application/json" });
-    });
+describe("DELETE /instruments/:id", () => {
+  it.only("deletes the instrument for an admin user", async () => {
+    const authHeader = ["Authorization", `Bearer ${adminAccessToken}`] as const;
+    const endpoint = "/instruments/1"; // Admin doesn't own instrument 1
+    {
+      // Delete call succeeds
+      const res = await request(app)
+        .delete(endpoint)
+        .set(...authHeader);
+      expect(res).toHaveProperty("status", 204);
+    }
+    {
+      // Instrument is deleted
+      const res = await request(app).get(endpoint);
+      expect(res).toHaveProperty("status", 404);
+    }
+    {
+      // Delete call is idempotent
+      const res = await request(app)
+        .delete(endpoint)
+        .set(...authHeader);
+      expect(res).toHaveProperty("status", 204);
+    }
+  });
+
+  it.only("deletes an instrument for the user whose userId matches", async () => {
+    const authHeader = ["Authorization", `Bearer ${userAccessToken}`] as const;
+    const endpoint = "/instruments/1"; // User owns instrument 1
+    {
+      // Delete call succeeds
+      const res = await request(app)
+        .delete(endpoint)
+        .set(...authHeader);
+      expect(res).toHaveProperty("status", 204);
+    }
+    {
+      // Instrument is deleted
+      const res = await request(app).get(endpoint);
+      expect(res).toHaveProperty("status", 404);
+    }
+    {
+      // Delete call is idempotent
+      const res = await request(app)
+        .delete(endpoint)
+        .set(...authHeader);
+      expect(res).toHaveProperty("status", 204);
+    }
+  });
+
+  it.only("returns FORBIDDEN for a user whose userId doesn't match", async () => {
+    const res = await request(app)
+      .delete("/instruments/2") // User doesn't own instrument 2
+      .set("Authorization", `Bearer ${userAccessToken}`);
+    expect(res).toHaveProperty("status", 403);
   });
 });
 

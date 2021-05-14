@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { categoryIdExists } from "#db/category";
 import {
+  deleteInstrumentById,
   getAllInstruments,
   getInstrumentById,
   getInstrumentsByCategoryId,
@@ -71,6 +72,21 @@ router
       res.status(StatusCodes.NOT_FOUND).json({ error });
     } else {
       res.status(StatusCodes.OK).json(instrument);
+    }
+  })
+  .delete<{ id: string }>(requireAuth, async (req, res) => {
+    assertAuthRequest(req);
+    const instrumentId = Number(req.params.id);
+    const instrument = await getInstrumentById(instrumentId);
+
+    if (!instrument) {
+      res.sendStatus(StatusCodes.NO_CONTENT);
+    } else if (req.user.isAdmin || instrument.userId === req.user.id) {
+      await deleteInstrumentById(instrumentId);
+      res.sendStatus(StatusCodes.NO_CONTENT);
+    } else {
+      const error = "You don't have permission to delete this instrument";
+      res.status(StatusCodes.FORBIDDEN).json({ error });
     }
   });
 

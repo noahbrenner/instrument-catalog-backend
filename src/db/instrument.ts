@@ -72,3 +72,11 @@ export function getInstrumentById(id: number): Promise<IInstrument | null> {
     WHERE id = ${id};
   `);
 }
+
+export async function deleteInstrumentById(id: number): Promise<void> {
+  await pool.query(sql`
+    DELETE
+    FROM instruments
+    WHERE id = ${id};
+  `);
+}
