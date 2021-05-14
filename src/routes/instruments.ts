@@ -46,12 +46,6 @@ router.get("/", async (req, res) => {
   res.status(StatusCodes.OK).json({ instruments });
 });
 
-router.get("/test", requireAuth, (req, res) => {
-  assertAuthRequest(req);
-  const { id: userId, isAdmin } = req.user;
-  res.status(200).json({ userId, isAdmin });
-});
-
 router
   .route("/:id")
   /** Validate the instrument ID format for all methods */
