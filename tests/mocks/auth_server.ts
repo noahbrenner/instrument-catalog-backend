@@ -42,37 +42,49 @@ export const authServer = setupServer(
   rest.get(authEndpoint, (_req, res, ctx) => res(ctx.json({ keys: [key] })))
 );
 
+const fluteOwnerUserId = "seed.user|1";
+const unseededUserId = "seed.user|99"; // Owns no instruments in our seed data
+
 /** This user owns the instrument "Flute" and does not own "Double Bass" */
-export const userAccessToken = jws.sign({
-  secret: privateKey,
-  header: { alg: "RS256", typ: "JWT", kid: correctKid },
-  payload: {
-    sub: "seed.user|1",
-    aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
-    iss: `https://${AUTH0_DOMAIN}/`, // Issuer
-  },
-});
+export const user = {
+  id: fluteOwnerUserId,
+  accessToken: jws.sign({
+    secret: privateKey,
+    header: { alg: "RS256", typ: "JWT", kid: correctKid },
+    payload: {
+      sub: fluteOwnerUserId,
+      aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
+      iss: `https://${AUTH0_DOMAIN}/`, // Issuer
+    },
+  }),
+};
 
 /** This user owns no instruments but is an admin */
-export const adminAccessToken = jws.sign({
-  secret: privateKey,
-  header: { alg: "RS256", typ: "JWT", kid: correctKid },
-  payload: {
-    sub: "seed.user|99",
-    "http:auth/roles": ["admin"],
-    aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
-    iss: `https://${AUTH0_DOMAIN}/`, // Issuer
-  },
-});
+export const admin = {
+  id: unseededUserId,
+  accessToken: jws.sign({
+    secret: privateKey,
+    header: { alg: "RS256", typ: "JWT", kid: correctKid },
+    payload: {
+      sub: unseededUserId,
+      "http:auth/roles": ["admin"],
+      aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
+      iss: `https://${AUTH0_DOMAIN}/`, // Issuer
+    },
+  }),
+};
 
-/** This token would be for an admin, but is invalid due to an incorrect kid */
-export const invalidAccessToken = jws.sign({
-  secret: privateKey,
-  header: { alg: "RS256", typ: "JWT", kid: incorrectKid },
-  payload: {
-    sub: "seed.user|1",
-    "http:auth/roles": ["admin"],
-    aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
-    iss: `https://${AUTH0_DOMAIN}/`, // Issuer
-  },
-});
+/** This user would be an admin, but has an invalid access token (bad kid) */
+export const invalidUser = {
+  id: fluteOwnerUserId,
+  accessToken: jws.sign({
+    secret: privateKey,
+    header: { alg: "RS256", typ: "JWT", kid: incorrectKid },
+    payload: {
+      sub: "seed.user|1",
+      "http:auth/roles": ["admin"],
+      aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
+      iss: `https://${AUTH0_DOMAIN}/`, // Issuer
+    },
+  }),
+};

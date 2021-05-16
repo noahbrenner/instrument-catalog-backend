@@ -2,11 +2,7 @@ import request from "supertest";
 
 import { pool, sql } from "#db/index";
 import { app } from "#server";
-import {
-  userAccessToken,
-  adminAccessToken,
-  invalidAccessToken,
-} from "../mocks/auth_server";
+import { user, admin, invalidUser } from "../mocks/auth_server";
 
 function expectValidInstrument(obj: unknown) {
   expect(obj).toEqual({
@@ -86,15 +82,15 @@ describe("GET /instruments?cat=<category_id>", () => {
 
 describe("POST|PUT|DELETE /instruments/*", () => {
   it("returns BAD REQUEST for an invalid access token", async () => {
-    const authHeader = [
+    const header = [
       "Authorization",
-      `Bearer ${invalidAccessToken}`,
+      `Bearer ${invalidUser.accessToken}`,
     ] as const;
 
     const requests = await Promise.all([
       request(app)
         .delete("/instruments/1")
-        .set(...authHeader),
+        .set(...header),
     ]);
 
     requests.forEach((res) => {
@@ -116,7 +112,7 @@ describe("POST|PUT|DELETE /instruments/*", () => {
 describe("GET|PUT|DELETE /instruments/:id", () => {
   it("returns BAD REQUEST responses for invalid IDs", async () => {
     const invalidIds = ["-1", "1.0", "1foo", "bar1"];
-    const authHeader = ["Authorization", `Bearer ${userAccessToken}`] as const;
+    const header = ["Authorization", `Bearer ${user.accessToken}`] as const;
 
     const requests = await Promise.all([
       // GET
@@ -126,14 +122,14 @@ describe("GET|PUT|DELETE /instruments/:id", () => {
       ...invalidIds.map((id) =>
         request(app)
           .put(`/instruments/${id}`)
-          .set(...authHeader)
+          .set(...header)
       ),
 
       // DELETE
       ...invalidIds.map((id) =>
         request(app)
           .delete(`/instruments/${id}`)
-          .set(...authHeader)
+          .set(...header)
       ),
     ]);
 
@@ -159,13 +155,13 @@ describe("GET /instruments/:id", () => {
 
 describe("DELETE /instruments/:id", () => {
   it("deletes the instrument for an admin user", async () => {
-    const authHeader = ["Authorization", `Bearer ${adminAccessToken}`] as const;
+    const header = ["Authorization", `Bearer ${admin.accessToken}`] as const;
     const endpoint = "/instruments/1"; // Admin doesn't own instrument 1
     {
       // Delete call succeeds
       const res = await request(app)
         .delete(endpoint)
-        .set(...authHeader);
+        .set(...header);
       expect(res).toHaveProperty("status", 204);
     }
     {
@@ -177,19 +173,19 @@ describe("DELETE /instruments/:id", () => {
       // Delete call is idempotent
       const res = await request(app)
         .delete(endpoint)
-        .set(...authHeader);
+        .set(...header);
       expect(res).toHaveProperty("status", 204);
     }
   });
 
   it("deletes an instrument for the user whose userId matches", async () => {
-    const authHeader = ["Authorization", `Bearer ${userAccessToken}`] as const;
+    const header = ["Authorization", `Bearer ${user.accessToken}`] as const;
     const endpoint = "/instruments/1"; // User owns instrument 1
     {
       // Delete call succeeds
       const res = await request(app)
         .delete(endpoint)
-        .set(...authHeader);
+        .set(...header);
       expect(res).toHaveProperty("status", 204);
     }
     {
@@ -201,7 +197,7 @@ describe("DELETE /instruments/:id", () => {
       // Delete call is idempotent
       const res = await request(app)
         .delete(endpoint)
-        .set(...authHeader);
+        .set(...header);
       expect(res).toHaveProperty("status", 204);
     }
   });
@@ -209,7 +205,7 @@ describe("DELETE /instruments/:id", () => {
   it("returns FORBIDDEN for a user whose userId doesn't match", async () => {
     const res = await request(app)
       .delete("/instruments/2") // User doesn't own instrument 2
-      .set("Authorization", `Bearer ${userAccessToken}`);
+      .set("Authorization", `Bearer ${user.accessToken}`);
     expect(res).toHaveProperty("status", 403);
   });
 });
