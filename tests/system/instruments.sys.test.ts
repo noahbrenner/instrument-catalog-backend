@@ -84,7 +84,7 @@ describe("GET /instruments?cat=<category_id>", () => {
   });
 });
 
-describe.only("POST|PUT|DELETE /instruments/*", () => {
+describe("POST|PUT|DELETE /instruments/*", () => {
   it("returns BAD REQUEST for an invalid access token", async () => {
     const authHeader = [
       "Authorization",
@@ -113,7 +113,7 @@ describe.only("POST|PUT|DELETE /instruments/*", () => {
   });
 });
 
-describe.only("GET|PUT|DELETE /instruments/:id", () => {
+describe("GET|PUT|DELETE /instruments/:id", () => {
   it("returns BAD REQUEST responses for invalid IDs", async () => {
     const invalidIds = ["-1", "1.0", "1foo", "bar1"];
     const authHeader = ["Authorization", `Bearer ${userAccessToken}`] as const;
@@ -158,7 +158,7 @@ describe("GET /instruments/:id", () => {
 });
 
 describe("DELETE /instruments/:id", () => {
-  it.only("deletes the instrument for an admin user", async () => {
+  it("deletes the instrument for an admin user", async () => {
     const authHeader = ["Authorization", `Bearer ${adminAccessToken}`] as const;
     const endpoint = "/instruments/1"; // Admin doesn't own instrument 1
     {
@@ -182,7 +182,7 @@ describe("DELETE /instruments/:id", () => {
     }
   });
 
-  it.only("deletes an instrument for the user whose userId matches", async () => {
+  it("deletes an instrument for the user whose userId matches", async () => {
     const authHeader = ["Authorization", `Bearer ${userAccessToken}`] as const;
     const endpoint = "/instruments/1"; // User owns instrument 1
     {
@@ -206,7 +206,7 @@ describe("DELETE /instruments/:id", () => {
     }
   });
 
-  it.only("returns FORBIDDEN for a user whose userId doesn't match", async () => {
+  it("returns FORBIDDEN for a user whose userId doesn't match", async () => {
     const res = await request(app)
       .delete("/instruments/2") // User doesn't own instrument 2
       .set("Authorization", `Bearer ${userAccessToken}`);
