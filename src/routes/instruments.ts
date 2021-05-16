@@ -8,7 +8,7 @@ import {
   getInstrumentById,
   getInstrumentsByCategoryId,
 } from "#db/instrument";
-import { assertAuthRequest, requireAuth } from "#shared/auth";
+import { requestUserCanModify, requireAuth } from "#shared/auth";
 
 const router = Router();
 
@@ -69,13 +69,12 @@ router
     }
   })
   .delete<{ id: string }>(requireAuth, async (req, res) => {
-    assertAuthRequest(req);
     const instrumentId = Number(req.params.id);
     const instrument = await getInstrumentById(instrumentId);
 
     if (!instrument) {
       res.sendStatus(StatusCodes.NO_CONTENT);
-    } else if (req.user.isAdmin || instrument.userId === req.user.id) {
+    } else if (requestUserCanModify(req, instrument)) {
       await deleteInstrumentById(instrumentId);
       res.sendStatus(StatusCodes.NO_CONTENT);
     } else {
