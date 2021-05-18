@@ -331,9 +331,18 @@ describe("DELETE /instruments/:id", () => {
   });
 
   it("returns FORBIDDEN for a user whose userId doesn't match", async () => {
-    const res = await request(app)
-      .delete("/instruments/2") // User doesn't own instrument 2
-      .set("Authorization", `Bearer ${user.accessToken}`);
-    expect(res).toHaveProperty("status", 403);
+    const endpoint = "/instruments/2"; // User doesn't own instrument 2
+    {
+      // Delete call fails
+      const res = await request(app)
+        .delete(endpoint) // User doesn't own instrument 2
+        .set("Authorization", `Bearer ${user.accessToken}`);
+      expect(res).toHaveProperty("status", 403);
+    }
+    {
+      // Instrument is not deleted
+      const res = await request(app).get(endpoint);
+      expect(res).toHaveProperty("status", 200);
+    }
   });
 });
