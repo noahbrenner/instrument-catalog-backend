@@ -95,14 +95,14 @@ router
     const instrumentId = Number(req.params.id);
     const instrument = await getInstrumentById(instrumentId);
 
-    if (!instrument) {
+    if (instrument === null) {
       res.sendStatus(StatusCodes.NO_CONTENT);
-    } else if (requestUserCanModify(req, instrument)) {
-      await deleteInstrumentById(instrumentId);
-      res.sendStatus(StatusCodes.NO_CONTENT);
-    } else {
+    } else if (!requestUserCanModify(req, instrument)) {
       const error = "You don't have permission to delete this instrument";
       res.status(StatusCodes.FORBIDDEN).json({ error });
+    } else {
+      await deleteInstrumentById(instrumentId);
+      res.sendStatus(StatusCodes.NO_CONTENT);
     }
   });
 
