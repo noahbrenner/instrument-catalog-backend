@@ -4,7 +4,7 @@ import { pool, sql } from ".";
 
 // I prefer `interface` over `type`, but Slonik has a type bug preventing that:
 // https://github.com/gajus/slonik/issues/268
-type IInstrument = {
+export type IInstrument = {
   id: number;
   categoryId: number;
   userId: string;
@@ -70,6 +70,30 @@ export function getInstrumentById(id: number): Promise<IInstrument | null> {
     SELECT ${allColumns}
     FROM instruments
     WHERE id = ${id};
+  `);
+}
+
+/** Updates an existing instrument, but doesn't change its id or userId */
+export async function updateInstrumentById(
+  instrumentId: number,
+  {
+    categoryId,
+    name,
+    summary,
+    description,
+    imageUrl,
+  }: Omit<IInstrument, "id" | "userId">
+): Promise<IInstrument> {
+  return pool.one(sql`
+    UPDATE instruments
+    SET
+      category_id = ${categoryId},
+      name = ${name},
+      summary = ${summary},
+      description = ${description},
+      image_url = ${imageUrl}
+    WHERE id = ${instrumentId}
+    RETURNING ${allColumns};
   `);
 }
 

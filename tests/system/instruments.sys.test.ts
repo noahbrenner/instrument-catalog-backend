@@ -81,6 +81,14 @@ describe("GET /instruments?cat=<category_id>", () => {
 });
 
 describe("POST|PUT|DELETE /instruments/*", () => {
+  const mockInstrument = {
+    categoryId: 1,
+    name: "Foo",
+    summary: "Bar",
+    description: "Baz",
+    imageUrl: "buzz",
+  };
+
   it("returns BAD REQUEST for an invalid access token", async () => {
     const header = [
       "Authorization",
@@ -88,6 +96,10 @@ describe("POST|PUT|DELETE /instruments/*", () => {
     ] as const;
 
     const requests = await Promise.all([
+      request(app)
+        .put("/instruments/1")
+        .send(mockInstrument)
+        .set(...header),
       request(app)
         .delete("/instruments/1")
         .set(...header),
@@ -100,6 +112,7 @@ describe("POST|PUT|DELETE /instruments/*", () => {
 
   it("returns BAD REQUEST for a missing access token", async () => {
     const requests = await Promise.all([
+      request(app).put("/instruments/1").send(mockInstrument),
       request(app).delete("/instruments/1"),
     ]);
 
@@ -150,6 +163,121 @@ describe("GET /instruments/:id", () => {
     await truncateInstrumentsTable();
     const res = await request(app).get("/instruments/1");
     expect(res).toMatchObject({ status: 404, type: "application/json" });
+  });
+});
+
+describe("PUT /instruments/:id", () => {
+  const adminHeader = ["Authorization", `Bearer ${admin.accessToken}`] as const;
+  const userHeader = ["Authorization", `Bearer ${user.accessToken}`] as const;
+  const mockInstrument = {
+    categoryId: 1,
+    name: "Foo",
+    summary: "Bar",
+    description: "Baz",
+    imageUrl: "buzz",
+  };
+
+  it("updates the instrument for an admin user", async () => {
+    const instrumentId = 1; // Admin doesn't own instrument 1
+    const endpoint = `/instruments/${instrumentId}`;
+    const expectedResult = {
+      ...mockInstrument,
+      id: instrumentId,
+      userId: user.id, // The original user, *NOT* the admin user
+    };
+
+    {
+      // Update call succeeds and returns the updated instrument
+      const res = await request(app)
+        .put(endpoint)
+        .send(mockInstrument)
+        .set(...adminHeader);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+    {
+      // Update persists
+      const res = await request(app).get(endpoint);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+  });
+
+  it("updates the instrument for a user whose userId matches", async () => {
+    const instrumentId = 1; // User owns instrument 1
+    const endpoint = `/instruments/${instrumentId}`;
+    const expectedResult = {
+      ...mockInstrument,
+      id: instrumentId,
+      userId: user.id, // The original user, *NOT* the admin user
+    };
+
+    {
+      // Update call succeeds and returns the updated instrument
+      const res = await request(app)
+        .put(endpoint)
+        .send(mockInstrument)
+        .set(...userHeader);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+    {
+      // Update persists
+      const res = await request(app).get(endpoint);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+  });
+
+  it("returns FORBIDDEN for a user whose userId doesn't match", async () => {
+    const endpoint = "/instruments/2"; // User doesn't own instrument 2
+
+    {
+      // Update call succeeds and returns the updated instrument
+      const res = await request(app)
+        .put(endpoint)
+        .send(mockInstrument)
+        .set(...userHeader);
+      expect(res).toHaveProperty("status", 403);
+    }
+    {
+      // Instrument was not updated
+      const res = await request(app).get(endpoint);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body.name).not.toBe("Foo");
+    }
+  });
+
+  it("returns NOT FOUND for a nonexistent instrument", async () => {
+    const endpoint = "/instruments/99"; // Not in our seed data
+
+    const res = await request(app)
+      .put(endpoint)
+      .send(mockInstrument)
+      .set(...userHeader);
+    expect(res).toHaveProperty("status", 404);
+  });
+
+  it("returns BAD REQUEST for an invalid request body", async () => {
+    const endpoint = "/instruments/1"; // User owns instrument 1
+    const invalidInstruments = [
+      { ...mockInstrument, name: 2 }, // Wrong type
+      { ...mockInstrument, categoryId: 99 }, // Nonexistent category
+      (() => {
+        const { categoryId, name, summary, imageUrl } = mockInstrument;
+        return { categoryId, name, summary, imageUrl }; // Missing description
+      })(),
+    ];
+
+    await Promise.all(
+      invalidInstruments.map(async (invalidInstrument) => {
+        const res = await request(app)
+          .put(endpoint)
+          .send(invalidInstrument)
+          .set(...userHeader);
+        expect(res).toHaveProperty("status", 400);
+      })
+    );
   });
 });
 

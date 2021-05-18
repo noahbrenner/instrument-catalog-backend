@@ -7,8 +7,10 @@ import {
   getAllInstruments,
   getInstrumentById,
   getInstrumentsByCategoryId,
+  updateInstrumentById,
 } from "#db/instrument";
 import { requestUserCanModify, requireAuth } from "#shared/auth";
+import { isInstrumentWithUserDefinedFields } from "#shared/typeguard";
 
 const router = Router();
 
@@ -66,6 +68,27 @@ router
       res.status(StatusCodes.NOT_FOUND).json({ error });
     } else {
       res.status(StatusCodes.OK).json(instrument);
+    }
+  })
+  .put<{ id: string }>(requireAuth, async (req, res) => {
+    const instrumentId = Number(req.params.id);
+    const instrument = await getInstrumentById(instrumentId);
+
+    if (instrument === null) {
+      const error = `No instrument found with id: ${instrumentId}`;
+      res.status(StatusCodes.NOT_FOUND).json({ error });
+    } else if (!requestUserCanModify(req, instrument)) {
+      const error = "You don't have permission to delete this instrument";
+      res.status(StatusCodes.FORBIDDEN).json({ error });
+    } else if (!isInstrumentWithUserDefinedFields(req.body)) {
+      const error = "Invalid request body";
+      res.status(StatusCodes.BAD_REQUEST).json({ error });
+    } else if (!(await categoryIdExists(req.body.categoryId))) {
+      const error = `Unknown categoryId: ${req.body.categoryId}`;
+      res.status(StatusCodes.BAD_REQUEST).json({ error });
+    } else {
+      const updated = await updateInstrumentById(instrumentId, req.body);
+      res.status(StatusCodes.OK).json(updated);
     }
   })
   .delete<{ id: string }>(requireAuth, async (req, res) => {
