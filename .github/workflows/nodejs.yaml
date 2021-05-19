@@ -41,6 +41,7 @@ jobs:
       - run: npm run lint:lint
       - run: npm run lint:types
       - run: npm run lint:format
+      - run: docker-compose up -d db
       - run: npm run migrate up
       - run: npm run seed all
       - run: npm test
