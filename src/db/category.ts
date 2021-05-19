@@ -40,10 +40,20 @@ export async function getAllCategories(): Promise<ICategory[]> {
   }
 }
 
-export function getCategoryBySlug(slug: string): Promise<ICategory | null> {
+export function getCategoryBySlug(
+  slug: ICategory["slug"]
+): Promise<ICategory | null> {
   return pool.maybeOne<ICategory>(sql`
     SELECT ${allColumns}
     FROM categories
     WHERE slug = ${slug};
   `);
+}
+
+export function categoryIdExists(id: ICategory["id"]): Promise<boolean> {
+  return pool.exists(sql`
+    SELECT 1
+    FROM categories
+    WHERE id = ${id}
+  `); // There's no ";" in this SQL because it's wrapped inside another query
 }

@@ -13,6 +13,7 @@
     "paths": {
       "#db/*": ["src/db/*"],
       "#shared/*": ["src/shared/*"],
+      "#seed": ["seed.ts"],
       "#server": ["src/server.ts"]
     },
     "removeComments": false,
