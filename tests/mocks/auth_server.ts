@@ -59,6 +59,20 @@ export const user = {
   }),
 };
 
+/** This user owns no instruments and is not in the users table */
+export const unseededUser = {
+  id: unseededUserId,
+  accessToken: jws.sign({
+    secret: privateKey,
+    header: { alg: "RS256", typ: "JWT", kid: correctKid },
+    payload: {
+      sub: unseededUserId,
+      aud: AUTH0_BACKEND_API_IDENTIFIER, // Audience
+      iss: `https://${AUTH0_DOMAIN}/`, // Issuer
+    },
+  }),
+};
+
 /** This user owns no instruments but is an admin */
 export const admin = {
   id: unseededUserId,

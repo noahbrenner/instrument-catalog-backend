@@ -2,7 +2,7 @@ import request from "supertest";
 
 import { pool, sql } from "#db/index";
 import { app } from "#server";
-import { user, admin, invalidUser } from "../mocks/auth_server";
+import { user, unseededUser, admin, invalidUser } from "../mocks/auth_server";
 
 function expectValidInstrument(obj: unknown) {
   expect(obj).toEqual({
@@ -80,6 +80,94 @@ describe("GET /instruments?cat=<category_id>", () => {
   });
 });
 
+describe("POST /instruments", () => {
+  let highestSeededInstrumentId: number;
+  const mockInstrument = {
+    categoryId: 1,
+    name: "Foo",
+    summary: "Bar",
+    description: "Baz",
+    imageUrl: "buzz",
+  };
+
+  beforeAll(async () => {
+    const res = await request(app).get("/instruments/all");
+    const { instruments } = res.body as { instruments: Array<{ id: number }> };
+    highestSeededInstrumentId = Math.max(...instruments.map(({ id }) => id));
+  });
+
+  it("creates an instrument for an existing user", async () => {
+    const newInstrumentId = highestSeededInstrumentId + 1;
+    const expectedResult = {
+      ...mockInstrument,
+      id: newInstrumentId,
+      userId: user.id,
+    };
+
+    {
+      // POST succeeds and returns the new instrument
+      const res = await request(app)
+        .post("/instruments")
+        .send(mockInstrument)
+        .set("Authorization", `Bearer ${user.accessToken}`);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+    {
+      // New instrument persists
+      const res = await request(app).get(`/instruments/${newInstrumentId}`);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+  });
+
+  it("creates an instrument for a new user", async () => {
+    const newInstrumentId = highestSeededInstrumentId + 1;
+    const expectedResult = {
+      ...mockInstrument,
+      id: newInstrumentId,
+      userId: unseededUser.id,
+    };
+
+    {
+      // POST succeeds and returns the new instrument
+      const res = await request(app)
+        .post("/instruments")
+        .send(mockInstrument)
+        .set("Authorization", `Bearer ${unseededUser.accessToken}`);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+    {
+      // New instrument persists
+      const res = await request(app).get(`/instruments/${newInstrumentId}`);
+      expect(res).toMatchObject({ status: 200, type: "application/json" });
+      expect(res.body).toEqual(expectedResult);
+    }
+  });
+
+  it("returns BAD REQUEST for an invalid request body", async () => {
+    const invalidInstruments = [
+      { ...mockInstrument, name: 2 }, // Wrong type
+      { ...mockInstrument, categoryId: 99 }, // Nonexistent category
+      (() => {
+        const { categoryId, name, summary, imageUrl } = mockInstrument;
+        return { categoryId, name, summary, imageUrl }; // Missing description
+      })(),
+    ];
+
+    await Promise.all(
+      invalidInstruments.map(async (invalidInstrument) => {
+        const res = await request(app)
+          .post("/instruments")
+          .send(invalidInstrument)
+          .set("Authorization", `Bearer ${user.accessToken}`);
+        expect(res).toHaveProperty("status", 400);
+      })
+    );
+  });
+});
+
 describe("POST|PUT|DELETE /instruments/*", () => {
   const mockInstrument = {
     categoryId: 1,
@@ -97,6 +185,10 @@ describe("POST|PUT|DELETE /instruments/*", () => {
 
     const requests = await Promise.all([
       request(app)
+        .post("/instruments")
+        .send(mockInstrument)
+        .set(...header),
+      request(app)
         .put("/instruments/1")
         .send(mockInstrument)
         .set(...header),
@@ -112,6 +204,7 @@ describe("POST|PUT|DELETE /instruments/*", () => {
 
   it("returns BAD REQUEST for a missing access token", async () => {
     const requests = await Promise.all([
+      request(app).post("/instruments").send(mockInstrument),
       request(app).put("/instruments/1").send(mockInstrument),
       request(app).delete("/instruments/1"),
     ]);

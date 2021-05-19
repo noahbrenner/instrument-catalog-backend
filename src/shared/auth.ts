@@ -27,7 +27,7 @@ function isInitialAuthRequest(req: Request): req is InitialAuthRequest {
 }
 
 /** Type guard for AuthRequest */
-function isAuthRequest(req: Request): req is AuthRequest {
+export function isAuthRequest(req: Request): req is AuthRequest {
   return typeof (req as AuthRequest).user?.id === "string";
 }
 

@@ -73,6 +73,47 @@ export function getInstrumentById(id: number): Promise<IInstrument | null> {
   `);
 }
 
+/** Creates a new instrument and also a new user if userId doesn't exist yet */
+export function createInstrument(
+  userId: IInstrument["userId"],
+  {
+    categoryId,
+    name,
+    summary,
+    description,
+    imageUrl,
+  }: Omit<IInstrument, "id" | "userId">
+): Promise<IInstrument> {
+  return pool.transaction(async (connection) => {
+    // The user ID must exist before an instrument can reference it
+    await connection.query(sql`
+      INSERT INTO users (id)
+      VALUES (${userId})
+      ON CONFLICT DO NOTHING;
+    `);
+
+    return connection.one(sql`
+      INSERT INTO instruments (
+        category_id,
+        user_id,
+        name,
+        summary,
+        description,
+        image_url
+      )
+      VALUES (
+        ${categoryId},
+        ${userId},
+        ${name},
+        ${summary},
+        ${description},
+        ${imageUrl}
+      )
+      RETURNING ${allColumns};
+    `);
+  });
+}
+
 /** Updates an existing instrument, but doesn't change its id or userId */
 export async function updateInstrumentById(
   instrumentId: number,

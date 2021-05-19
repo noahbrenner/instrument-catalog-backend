@@ -3,13 +3,14 @@ import { StatusCodes } from "http-status-codes";
 
 import { categoryIdExists } from "#db/category";
 import {
+  createInstrument,
   deleteInstrumentById,
   getAllInstruments,
   getInstrumentById,
   getInstrumentsByCategoryId,
   updateInstrumentById,
 } from "#db/instrument";
-import { requestUserCanModify, requireAuth } from "#shared/auth";
+import { isAuthRequest, requestUserCanModify, requireAuth } from "#shared/auth";
 import { isInstrumentWithUserDefinedFields } from "#shared/typeguard";
 
 const router = Router();
@@ -46,6 +47,20 @@ router.get("/", async (req, res) => {
 
   const instruments = await getInstrumentsByCategoryId(categoryId);
   res.status(StatusCodes.OK).json({ instruments });
+});
+
+router.post("/", requireAuth, async (req, res) => {
+  if (!isAuthRequest(req)) {
+    // requireAuth shouldn't allow us to reach this branch
+    const error = "Mismatch in authentication checks";
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error });
+  } else if (!isInstrumentWithUserDefinedFields(req.body)) {
+    const error = "Invalid request body";
+    res.status(StatusCodes.BAD_REQUEST).json({ error });
+  } else {
+    const newInstrument = await createInstrument(req.user.id, req.body);
+    res.status(StatusCodes.OK).json(newInstrument);
+  }
 });
 
 router
