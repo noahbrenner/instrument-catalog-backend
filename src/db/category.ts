@@ -40,7 +40,9 @@ export async function getAllCategories(): Promise<ICategory[]> {
   }
 }
 
-export function getCategoryBySlug(slug: string): Promise<ICategory | null> {
+export function getCategoryBySlug(
+  slug: ICategory["slug"]
+): Promise<ICategory | null> {
   return pool.maybeOne<ICategory>(sql`
     SELECT ${allColumns}
     FROM categories
@@ -48,7 +50,7 @@ export function getCategoryBySlug(slug: string): Promise<ICategory | null> {
   `);
 }
 
-export function categoryIdExists(id: number): Promise<boolean> {
+export function categoryIdExists(id: ICategory["id"]): Promise<boolean> {
   return pool.exists(sql`
     SELECT 1
     FROM categories

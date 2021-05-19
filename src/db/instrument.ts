@@ -48,7 +48,7 @@ export async function getAllInstruments(): Promise<IInstrument[]> {
 }
 
 export async function getInstrumentsByCategoryId(
-  categoryId: number
+  categoryId: IInstrument["categoryId"]
 ): Promise<IInstrument[]> {
   try {
     return (await pool.many<IInstrument>(sql`
@@ -65,7 +65,9 @@ export async function getInstrumentsByCategoryId(
   }
 }
 
-export function getInstrumentById(id: number): Promise<IInstrument | null> {
+export function getInstrumentById(
+  id: IInstrument["id"]
+): Promise<IInstrument | null> {
   return pool.maybeOne<IInstrument>(sql`
     SELECT ${allColumns}
     FROM instruments
@@ -116,7 +118,7 @@ export function createInstrument(
 
 /** Updates an existing instrument, but doesn't change its id or userId */
 export async function updateInstrumentById(
-  instrumentId: number,
+  instrumentId: IInstrument["id"],
   {
     categoryId,
     name,
@@ -138,7 +140,9 @@ export async function updateInstrumentById(
   `);
 }
 
-export async function deleteInstrumentById(id: number): Promise<void> {
+export async function deleteInstrumentById(
+  id: IInstrument["id"]
+): Promise<void> {
   await pool.query(sql`
     DELETE
     FROM instruments
