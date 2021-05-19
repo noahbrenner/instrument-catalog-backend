@@ -11,6 +11,8 @@ on:
 env:
   NODE_ENV: "development"
   ACCESS_CONTROL_ALLOW_ORIGIN: "http://localhost:5000"
+  AUTH0_DOMAIN: "not.a.real.domain"
+  AUTH0_BACKEND_API_IDENTIFIER: "http://localhost:3000"
   POSTGRES_PASSWORD: "verysecret"
   POSTGRES_USER: "db_user"
   POSTGRES_DB: "instrument_catalog"
